@@ -39,7 +39,43 @@ body{
 
 .screen{ display:flex; flex-direction:column; min-height:730px; padding:8px 24px 28px; }
 
-.constellation{ display:flex; align-items:center; justify-content:center; gap:14px; margin:10px 0 6px; }
+/*. OLD : constellation{ display:flex; align-items:center; justify-content:center; gap:14px; margin:10px 0 6px; } */
+/* Le conteneur sert de repère de positionnement */
+.constellation {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Ajustez la hauteur selon vos besoins */
+}
+
+/* Style de base partagé par tous les nœuds */
+.constellation .node {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary, #4A90E2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Affichage du texte défini dans data-label */
+.constellation .node::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: -25px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+/* Coordonnées spécifiques pour séparer les 4 nœuds en losange / cercle */
+.constellation .n-i { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Centre : Vous */
+.constellation .n-f { top: 10%; left: 50%; transform: translateX(-50%); }      /* Haut : Famille */
+.constellation .n-e { bottom: 10%; left: 20%; }                                 /* Bas gauche : Entreprise */
+.constellation .n-s { bottom: 10%; right: 20%; }                                /* Bas */
+
+
+
 .node{ width:9px; height:9px; border-radius:50%; position:relative; }
 .node::after{ content:attr(data-label); position:absolute; top:14px; left:50%; transform:translateX(-50%); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); white-space:nowrap; }
 .node.n-i{background:var(--rose-deep);} .node.n-f{background:var(--rose-mid);} .node.n-e{background:var(--rose-light);} .node.n-s{background:var(--burgundy);}

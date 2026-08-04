@@ -40,57 +40,65 @@ body{
 .screen{ display:flex; flex-direction:column; min-height:730px; padding:8px 24px 28px; }
 
 /*. OLD : constellation{ display:flex; align-items:center; justify-content:center; gap:14px; margin:10px 0 6px; } */
+/* ==========================================
+   CONSTELLATION (Cercle & Chevauchement)
+   ========================================== */
 .constellation {
   position: relative;
   width: 100%;
-  height: 280px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 10px 0;
 }
 
 /* Style de base des nœuds */
 .constellation .node {
   position: absolute;
-  width: 110px;  /* Taille augmentée pour favoriser le chevauchement */
+  width: 110px;
   height: 110px;
   border-radius: 50%;
-  opacity: 0.75; /* Transparence pour voir la superposition */
-  mix-blend-mode: multiply; /* Fusionne joliment les couleurs au croisement */
-  
-  /* Centrage parfait du texte à l'intérieur */
+  opacity: 0.85; /* Légère transparence pour la superposition */
+  mix-blend-mode: multiply;
+
+  /* Centrage parfait Haut/Bas et Gauche/Droite */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
+
+  /* Style du texte */
+  color: #ffffff !important; /* Blanc contrasté */
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Le texte généré via data-label */
 .constellation .node::after {
   content: attr(data-label);
   line-height: 1.1;
-  padding: 0 5px;
+  padding: 0 6px;
+  color: #ffffff !important; /* Forcer la couleur blanche */
+  position: static; /* Annule l'ancien positionnement absolu */
+  transform: none;  /* Annule les anciens décalages */
+  text-transform: none;
+  font-size: 0.85rem;
+  letter-spacing: normal;
 }
 
-/* Couleurs distinctes pour bien visualiser les intersections */
-.constellation .n-i { background: #4A90E2; } /* Vous */
-.constellation .n-f { background: #50E3C2; } /* Famille */
-.constellation .n-e { background: #F5A623; } /* Entreprise */
-.constellation .n-s { background: #BD10E0; } /* Société */
+/* Couleurs distinctes */
+.constellation .n-i { background: #3b82f6; } /* Vous (Bleu) */
+.constellation .n-f { background: #10b981; } /* Famille (Vert) */
+.constellation .n-e { background: #f59e0b; } /* Entreprise (Orange) */
+.constellation .n-s { background: #8b5cf6; } /* Société (Violet) */
 
-/* Positionnement rapproché pour créer le chevauchement aux limites */
+/* Coordonnées resserrées pour créer le chevauchement */
 .constellation .n-i { top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; } /* Centre */
-.constellation .n-f { top: 15%; left: 50%; transform: translateX(-50%); }                   /* Haut */
-.constellation .n-e { bottom: 15%; left: 28%; }                                            /* Bas gauche */
-.constellation .n-s { bottom: 15%; right: 28%; }                                           /* Bas droite */
-
-/* Coordonnées spécifiques pour séparer les 4 nœuds en losange / cercle */
-.constellation .n-i { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Centre : Vous */
-.constellation .n-f { top: 10%; left: 50%; transform: translateX(-50%); }      /* Haut : Famille */
-.constellation .n-e { bottom: 10%; left: 20%; }                                 /* Bas gauche : Entreprise */
-.constellation .n-s { bottom: 10%; right: 20%; }                                /* Bas */
+.constellation .n-f { top: 12%; left: 50%; transform: translateX(-50%); }                   /* Haut */
+.constellation .n-e { bottom: 12%; left: 24%; }                                            /* Bas gauche */
+.constellation .n-s { bottom: 12%; right: 24%; }
 
 
 

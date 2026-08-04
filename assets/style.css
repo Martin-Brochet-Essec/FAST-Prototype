@@ -50,8 +50,8 @@ body{
 /* Style de base partagé par tous les nœuds */
 .constellation .node {
   position: absolute;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--primary, #4A90E2);
   display: flex;

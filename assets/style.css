@@ -33,7 +33,7 @@ body{
 }
 .statusbar{ height:34px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:12px; color:var(--text-dim); font-variant-numeric: tabular-nums; }
 .brandmark{ color:var(--burgundy); font-weight:700; font-size:12px; letter-spacing:.04em; }
-.langswitch{ position:absolute; top:8px; right:14px; z-index:20; display:flex; justify-content: center; align-items: center; gap:3px; background:rgba(255,255,255,0.6); border:1px solid var(--line); border-radius:8px; padding:3px; }
+.langswitch{ position:absolute; top:8px; left:50%; z-index:20; display:flex; justify-content: center; align-items: center; gap:3px; background:rgba(255,255,255,0.6); border:1px solid var(--line); border-radius:8px; padding:3px; }
 .langbtn{ border:none; background:none; color:var(--text-dim); font-size:10px; font-weight:600; padding:4px 5px; border-radius:5px; cursor:pointer; }
 .langbtn.active{ background:var(--rose-deep); color:#fff; }
 

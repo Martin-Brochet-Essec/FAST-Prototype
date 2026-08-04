@@ -4,6 +4,7 @@
   <string key="menu_whoami">Qui suis-je</string>
   <string key="menu_config">Configuration</string>
   <string key="menu_subscription">Abonnement</string>
+  <string key="menu_accueil">Accueil</string>
   <string key="menu_deconnexion">Se déconnecter</string>
   <string key="back_accueil">Accueil</string>
   <string key="back_retour">Retour</string>

@@ -179,6 +179,29 @@ window.FAST = (function(){
     el.parentElement.dataset.selected = el.dataset.value;
   }
 
+
+  // 1. Fonction pour charger le prompt depuis le fichier XML
+async function loadCoachPrompt(coachId) {
+  try {
+    const res = await fetch('assets/prompts.xml');
+    const xmlText = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+    const coachNode = xmlDoc.querySelector(`coach[id="${coachId}"]`);
+    
+    if (coachNode) {
+      return {
+        system: coachNode.querySelector('system_prompt').textContent,
+        user: coachNode.querySelector('user_prompt').textContent
+      };
+    }
+  } catch (err) {
+    console.error('Erreur chargement XML prompt:', err);
+  }
+  return null;
+}
+
+  
   function init(){ applyI18n(); }
 
   return {

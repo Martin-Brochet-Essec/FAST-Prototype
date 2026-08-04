@@ -198,8 +198,7 @@ Vous pouvez placer l'étape 2.2 (`fetchAISynthesis`) juste après `loadCoachProm
 
 Remplacez la fin de votre fichier (à partir de la ligne où vous avez ajouté `loadCoachPrompt`) par ce bloc :
 
-```javascript
-  // 1. Fonction pour charger le prompt depuis le fichier XML
+ // 1. Fonction pour charger le prompt depuis le fichier XML
   async function loadCoachPrompt(coachId) {
     try {
       const res = await fetch('assets/prompts.xml');

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAST — Qui suis-je</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Petrona:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="device">
+  <div class="langswitch">
+    <button class="langbtn" data-lang="fr" onclick="FAST.setLang('fr')">FR</button>
+    <button class="langbtn" data-lang="en" onclick="FAST.setLang('en')">EN</button>
+    <button class="langbtn" data-lang="es" onclick="FAST.setLang('es')">ES</button>
+    <button class="langbtn" data-lang="ro" onclick="FAST.setLang('ro')">RO</button>
+  </div>
+  <div class="statusbar"><span>9:41</span><span class="brandmark">FAST</span></div>
+  <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">
+    <div class="menu-panel">
+      <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
+      <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
+      <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
+      <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
+      <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
+    </div>
+  </div>
+  <section class="screen">
+<a class="back" href="index.html" data-i18n="back_accueil">Accueil</a>
+<div class="eyebrow" data-i18n="whoami_eyebrow">Votre profil</div>
+<h1 data-i18n="whoami_h1">Qui suis-je</h1>
+<p class="lead" data-i18n="whoami_lead">Ce que nous avons appris de vous jusqu'ici — vous pouvez corriger à tout moment.</p>
+<div class="card">
+  <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 8px;" data-i18n="whoami_section_summary">Résumé collecté</h3>
+  <p class="summary-box" id="summaryText" data-i18n="whoami_summary_placeholder">Votre résumé apparaîtra ici au fil de vos réponses aux questions de profiling.</p>
+</div>
+<div class="card">
+  <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 8px;" data-i18n="whoami_section_milestones">Parcours & jalons atteints</h3>
+  <div class="milestone"><div class="dot-done"></div><span data-i18n="whoami_milestone_1">Diagnostic initial</span></div>
+  <div class="milestone"><div class="dot-done"></div><span data-i18n="whoami_milestone_2">Première semaine de routine</span></div>
+  <div class="milestone"><div class="dot-done"></div><span data-i18n="whoami_milestone_3">Premier exercice complété</span></div>
+</div>
+<div class="card">
+  <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 8px;" data-i18n="whoami_correct_label">Une correction à apporter ?</h3>
+  <textarea id="correction" rows="3" data-i18n-ph="whoami_correct_ph" placeholder="Ajoutez une précision ou une correction..."></textarea>
+  <button class="btn btn-ghost" id="correctionSave" data-i18n="whoami_cta">Enregistrer la correction</button>
+</div>
+  </section>
+</div>
+<script src="assets/fallback.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var all = JSON.parse(localStorage.getItem('fast_answers')||'[]');
+  if(all.length){
+    var lines = [];
+    all.forEach(function(entry){ entry.qa.forEach(function(q){ if(q.a) lines.push(q.a); }); });
+    if(lines.length) document.getElementById('summaryText').textContent = lines.slice(-4).join(' • ');
+  }
+  document.getElementById('correctionSave').addEventListener('click', function(){
+    var note = document.getElementById('correction').value;
+    FAST.logAnswers('who-am-i-correction', [{q: 'Correction manuelle', a: note}]);
+    document.getElementById('correction').value = '';
+  });
+});
+</script>
+</body>
+</html>

@@ -54,10 +54,13 @@ body{
   height: 80px;
   border-radius: 50%;
   background: var(--primary, #4A90E2);
+
+  /* Centrage parfait intérieur (Haut/Bas + Gauche/Droite) */
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  align-items: center;     /* Centrage vertical */
+  justify-content: center; /* Centrage horizontal */
+  text-align: center;
+  }
 
 /* Affichage du texte défini dans data-label */
 .constellation .node::after {

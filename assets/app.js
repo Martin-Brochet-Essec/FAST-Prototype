@@ -193,4 +193,29 @@ window.FAST = (function(){
   };
 })();
 
+// ==========================================
+// Composant Web Centralisé pour le Menu
+// ==========================================
+class FastHeader extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+      <div class="statusbar">
+        <span>9:41</span>
+        <button class="menubtn" onclick="FAST.openMenu()" aria-label="Menu" style="background:none; border:none; font-size:20px; cursor:pointer;">&#9776;</button>
+      </div>
+      <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">
+        <div class="menu-panel">
+          <a class="menu-item" href="index.html" data-i18n="menu_accueil">Accueil</a>
+          <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
+          <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
+          <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
+          <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
+          <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
+        </div>
+      </div>
+    `;
+  }
+}
+customElements.define('fast-header', FastHeader);
+
 document.addEventListener('DOMContentLoaded', FAST.init);

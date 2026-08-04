@@ -17,17 +17,30 @@
     <button class="langbtn" data-lang="es" onclick="FAST.setLang('es')">ES</button>
     <button class="langbtn" data-lang="ro" onclick="FAST.setLang('ro')">RO</button>
   </div>
-  <div class="statusbar"><span>9:41</span><span class="brandmark">FAST</span></div>
-  <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">
-    <div class="menu-panel">
-      <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
-      <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
-      <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
-      <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
-      <a class="menu-item" href="index.html" data-i18n="menu_accueil">Accueil</a>
-      <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
-    </div>
+  <div class="statusbar">
+  <span>9:41</span>
+  
+  <!-- Bouton burger 3 barres -->
+  <button type="button" class="btn-icon" onclick="FAST.openMenu()" aria-label="Menu" style="background:none; border:none; cursor:pointer; padding:0;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+</div>
+
+<!-- Overlay du menu -->
+<div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">
+  <div class="menu-panel">
+    <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
+    <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
+    <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
+    <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
+    <a class="menu-item" href="index.html" data-i18n="menu_accueil">Accueil</a>
+    <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
   </div>
+</div>
   <section class="screen">
 <a class="back" href="index.html" data-i18n="back_accueil">Accueil</a>
 <div class="eyebrow" data-i18n="config_eyebrow">Configuration</div>

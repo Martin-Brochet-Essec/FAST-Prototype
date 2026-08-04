@@ -201,7 +201,6 @@ class FastHeader extends HTMLElement {
     this.innerHTML = `
       <div class="statusbar">
         <span>9:41</span>
-      // <button class="menubtn" onclick="FAST.openMenu()" aria-label="Menu" style="background:none; border:none; font-size:20px; cursor:pointer;">&#9776;</button>
          <button class="menubtn" onclick="FAST.openMenu()" aria-label="Menu" style="background:none; border:none; font-size:20px; cursor:pointer; color: var(--text, #000);">&#9776;</button>
       </div>
       <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">

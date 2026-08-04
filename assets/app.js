@@ -180,116 +180,9 @@ window.FAST = (function(){
   }
 
 
-Vous êtes **presque au bon endroit**, mais il y a **deux petites choses à corriger** pour que cela fonctionne parfaitement :
-
----
-
-### 1. Il faut l'exposer dans le `return` de `FAST` (Obligatoire)
-
-La fonction `loadCoachPrompt` est bien placée à l'intérieur du module `FAST`, mais pour que la fonction `fetchAISynthesis` (étape 2.2) ou d'autres scripts puissent l'appeler via `FAST.loadCoachPrompt(...)`, **vous devez obligatoirement l'ajouter dans l'objet retourné (`return { ... }`) à la fin du module.**
-
-### 2. Où placer l'étape 2.2 (`fetchAISynthesis`) ?
-
-Vous pouvez placer l'étape 2.2 (`fetchAISynthesis`) juste après `loadCoachPrompt`, et penser à l'ajouter elle aussi dans le `return`.
-
----
-
-### Voici la correction exacte de la fin de votre fichier `assets/app.js` :
-
-Remplacez la fin de votre fichier (à partir de la ligne où vous avez ajouté `loadCoachPrompt`) par ce bloc :
-
- // 1. Fonction pour charger le prompt depuis le fichier XML
-  async function loadCoachPrompt(coachId) {
-    try {
-      const res = await fetch('assets/prompts.xml');
-      const xmlText = await res.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-      const coachNode = xmlDoc.querySelector(`coach[id="${coachId}"]`);
-      
-      if (coachNode) {
-        return {
-          system: coachNode.querySelector('system_prompt').textContent,
-          user: coachNode.querySelector('user_prompt').textContent
-        };
-      }
-    } catch (err) {
-      console.error('Erreur chargement XML prompt:', err);
-    }
-    return null;
-  }
-
-  // 2.2 Fonction pour interroger l'IA et afficher la synthèse
-  async function fetchAISynthesis(targetElementId) {
-    const targetEl = document.getElementById(targetElementId);
-    if (!targetEl) return;
-
-    targetEl.value = "Analyse de vos réponses en cours par l'IA...";
-
-    // Récupération des réponses dans le localStorage
-    const savedAnswers = JSON.parse(localStorage.getItem('fast_answers') || '[]');
-    
-    if (savedAnswers.length === 0) {
-      targetEl.value = "Aucune réponse enregistrée pour le moment.";
-      return;
-    }
-
-    // Mise en forme des réponses
-    let formattedAnswers = "";
-    savedAnswers.forEach(entry => {
-      if (entry.qa && Array.isArray(entry.qa)) {
-        entry.qa.forEach((item, index) => {
-          formattedAnswers += `${index + 1}. Q: ${item.q || ''}\n R: ${item.a || 'Non répondu'}\n\n`;
-        });
-      }
-    });
-
-    // Chargement du prompt
-    const promptData = await loadCoachPrompt('executive');
-    if (!promptData) {
-      targetEl.value = "Erreur : impossible de charger le prompt du coach.";
-      return;
-    }
-
-    const fullUserPrompt = promptData.user.replace('{ANSWERS}', formattedAnswers);
-
-    // Clé API et Endpoint (ex: OpenAI)
-    const API_KEY = "VOTRE_CLE_API_ICI"; 
-    const API_URL = "https://api.openai.com/v1/chat/completions";
-
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: promptData.system },
-            { role: "user", content: fullUserPrompt }
-          ],
-          temperature: 0.7
-        })
-      });
-
-      const data = await response.json();
-      
-      if (data.choices && data.choices[0]) {
-        targetEl.value = data.choices[0].message.content.trim();
-      } else {
-        targetEl.value = "Erreur lors de la génération par l'IA.";
-      }
-    } catch (error) {
-      console.error("Erreur API IA :", error);
-      targetEl.value = "Erreur de connexion avec l'IA.";
-    }
-  }
   
   function init(){ applyI18n(); }
 
-  // AJOUT ICI : Rendre les fonctions accessibles depuis l'extérieur (ex: FAST.fetchAISynthesis)
   return {
     getLang: getLang, setLang: setLang, applyI18n: applyI18n, dict: dict,
     loadQuestions: loadQuestions, runStepper: runStepper,
@@ -298,8 +191,6 @@ Remplacez la fin de votre fichier (à partir de la ligne où vous avez ajouté `
     logAnswers: logAnswers, exportTxt: exportTxt,
     openMenu: openMenu, closeMenu: closeMenu,
     selectFeel: selectFeel, selectRadio: selectRadio,
-    loadCoachPrompt: loadCoachPrompt,
-    fetchAISynthesis: fetchAISynthesis,
     init: init
   };
 })();

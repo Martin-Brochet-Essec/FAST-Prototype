@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coaches>
+  <coach id="executive">
+    <name>Coach Exécutif</name>
+    <system_prompt>Tu es un coach professionnel expérimenté et bienveillant. Analyse les 10 réponses fournies par l'utilisateur.</system_prompt>
+    <user_prompt>Voici les réponses de l'utilisateur aux 10 questions de cadrage : &#10;{ANSWERS}&#10;&#10;Rédige une synthèse claire en 3 à 4 phrases maximum résumant sa situation actuelle, ses besoins principaux et ses attentes.</user_prompt>
+  </coach>
+</coaches>

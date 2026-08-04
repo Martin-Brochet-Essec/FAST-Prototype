@@ -40,36 +40,51 @@ body{
 .screen{ display:flex; flex-direction:column; min-height:730px; padding:8px 24px 28px; }
 
 /*. OLD : constellation{ display:flex; align-items:center; justify-content:center; gap:14px; margin:10px 0 6px; } */
-/* Le conteneur sert de repère de positionnement */
 .constellation {
   position: relative;
   width: 100%;
-  height: 300px; /* Ajustez la hauteur selon vos besoins */
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Style de base partagé par tous les nœuds */
+/* Style de base des nœuds */
 .constellation .node {
   position: absolute;
-  width: 80px;
-  height: 80px;
+  width: 110px;  /* Taille augmentée pour favoriser le chevauchement */
+  height: 110px;
   border-radius: 50%;
-  background: var(--primary, #4A90E2);
-
-  /* Centrage parfait intérieur (Haut/Bas + Gauche/Droite) */
+  opacity: 0.75; /* Transparence pour voir la superposition */
+  mix-blend-mode: multiply; /* Fusionne joliment les couleurs au croisement */
+  
+  /* Centrage parfait du texte à l'intérieur */
   display: flex;
-  align-items: center;     /* Centrage vertical */
-  justify-content: center; /* Centrage horizontal */
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  }
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
 
-/* Affichage du texte défini dans data-label */
 .constellation .node::after {
   content: attr(data-label);
-  position: absolute;
-  bottom: -2px;
-  white-space: nowrap;
-  font-size: 0.85rem;
+  line-height: 1.1;
+  padding: 0 5px;
 }
+
+/* Couleurs distinctes pour bien visualiser les intersections */
+.constellation .n-i { background: #4A90E2; } /* Vous */
+.constellation .n-f { background: #50E3C2; } /* Famille */
+.constellation .n-e { background: #F5A623; } /* Entreprise */
+.constellation .n-s { background: #BD10E0; } /* Société */
+
+/* Positionnement rapproché pour créer le chevauchement aux limites */
+.constellation .n-i { top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; } /* Centre */
+.constellation .n-f { top: 15%; left: 50%; transform: translateX(-50%); }                   /* Haut */
+.constellation .n-e { bottom: 15%; left: 28%; }                                            /* Bas gauche */
+.constellation .n-s { bottom: 15%; right: 28%; }                                           /* Bas droite */
 
 /* Coordonnées spécifiques pour séparer les 4 nœuds en losange / cercle */
 .constellation .n-i { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Centre : Vous */

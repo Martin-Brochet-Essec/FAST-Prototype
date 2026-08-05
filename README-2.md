@@ -51,6 +51,29 @@ exemple-site-github-pages/
    `https://votre-utilisateur.github.io/votre-depot/`. Ouvrez-la : la page 1
    doit afficher la question.
 
+## Choisir le fournisseur IA (Anthropic, OpenAI, Gemini, Mistral)
+
+Un site statique n'a pas accès à de vraies variables d'environnement
+(`process.env`) — c'est une limite du navigateur, pas de ce projet. Le choix
+se fait donc dans `js/config.js` :
+
+```js
+FOURNISSEUR_IA: "anthropic",   // "anthropic" | "openai" | "gemini" | "mistral"
+```
+
+Renseignez ensuite la clé API et le modèle correspondants dans le même
+fichier (`ANTHROPIC`, `OPENAI`, `GEMINI`, `MISTRAL`). Le reste du site
+(stockage XML/TXT, page 2) fonctionne à l'identique quel que soit le
+fournisseur choisi — seule la fonction d'appel change dans `js/page1.js`.
+
+⚠️ **CORS** : Anthropic autorise explicitement les appels directs depuis un
+navigateur (en-tête `anthropic-dangerous-direct-browser-access`) et Gemini
+fonctionne aussi en direct. OpenAI et Mistral, en revanche, ne renvoient
+généralement pas les en-têtes CORS nécessaires : un appel direct depuis
+GitHub Pages a de bonnes chances d'échouer avec ces deux fournisseurs. Si
+c'est le cas, il faudra passer par une petite fonction serverless relais
+(voir la section suivante) qui elle n'est pas soumise à cette contrainte.
+
 ## Tester sans clé API
 
 Si `ANTHROPIC_API_KEY` n'est pas remplie, l'appel à `interrogerAgentIA()`

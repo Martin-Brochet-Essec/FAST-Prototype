@@ -17,15 +17,17 @@
     <button class="langbtn" data-lang="es" onclick="FAST.setLang('es')">ES</button>
     <button class="langbtn" data-lang="ro" onclick="FAST.setLang('ro')">RO</button>
   </div>
-  
-<!-- Le composant centralisé gère seul la statusbar et le menu -->
+
+  <!-- Le composant centralisé gère seul la statusbar et le menu -->
   <fast-header></fast-header>
-  
+
+
   <section class="screen">
 <a class="back" href="#" onclick="history.back(); return false;" data-i18n="back_generic">Retour</a>
 <div class="eyebrow" data-i18n="deepen_eyebrow">On approfondit</div>
-<h1 data-i18n="deepen_h1">Encore quelques précisions</h1>
-<p class="lead" data-i18n="deepen_lead">Trois questions pour bien saisir votre situation avant de vous répondre.</p>
+<div class="card">
+  <p style="font-size:13.5px; color:var(--text-dim); line-height:1.6; margin:0;" data-i18n="deepen_lead">Trois questions pour bien saisir votre situation avant de vous répondre.</p>
+</div>
 <div class="progress-label" id="q-progress"></div>
 <div class="qcard"><p id="q-text"></p></div>
 <textarea class="answer-field" rows="2" id="q-answer" data-i18n-ph="answer_ph" placeholder="Votre réponse..."></textarea>
@@ -40,7 +42,7 @@
 <script src="assets/app.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  FAST.runStepper('deepen', 'deepen_label', 'email-sent.html');
+  FAST.runStepper('deepen', 'deepen_label', 'final-response.html');
 });
 </script>
 </body>

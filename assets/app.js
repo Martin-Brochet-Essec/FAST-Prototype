@@ -136,6 +136,109 @@ window.FAST = (function(){
     document.body.removeChild(a);
   }
 
+  // ---- Synthèse IA à partir des réponses d'un set de questions ----
+
+  // Retrouve les réponses enregistrées pour un écran donné (le plus récent
+  // passage, au cas où l'utilisatrice aurait refait le parcours).
+  function getAnswersFor(screenId){
+    const all = JSON.parse(localStorage.getItem('fast_answers') || '[]');
+    const entry = all.slice().reverse().find(e => e.screen === screenId);
+    return entry ? entry.qa : [];
+  }
+
+  function formatAnswersBlock(qaPairs){
+    return qaPairs.map(q => 'Q: ' + q.q + '\nR: ' + (q.a || '')).join('\n\n');
+  }
+
+  // Charge le prompt d'un coach depuis assets/prompts.xml (system_prompt +
+  // user_prompt, ce dernier contenant {ANSWERS} à remplacer).
+  async function loadCoachPrompt(coachId){
+    let systemPrompt = '', userPromptTemplate = '';
+    try{
+      const res = await fetch('assets/prompts.xml');
+      if(res.ok){
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/xml');
+        const coach = Array.from(doc.querySelectorAll('coach')).find(c => c.getAttribute('id') === coachId);
+        if(coach){
+          systemPrompt = (coach.querySelector('system_prompt')?.textContent || '').trim();
+          userPromptTemplate = (coach.querySelector('user_prompt')?.textContent || '').trim();
+        }
+      }
+    }catch(e){ /* file:// — pas de repli prévu ici, le prompt IA n'a pas d'équivalent fallback.js */ }
+    return { systemPrompt: systemPrompt, userPromptTemplate: userPromptTemplate };
+  }
+
+  // Point d'entrée utilisé par results.html : rassemble les réponses du set
+  // `sourceScreenId` (typiquement 'q10'), assemble le prompt du coach
+  // `coachId`, appelle l'IA (window.FAST_AI, voir assets/ai.js) et stocke
+  // le résultat pour affichage/relecture.
+  async function runCoachSynthesis(coachId, sourceScreenId){
+    const qa = getAnswersFor(sourceScreenId);
+    const answersBlock = formatAnswersBlock(qa);
+    const prompt = await loadCoachPrompt(coachId);
+
+    // Consigne explicite : sans elle, l'IA a tendance à décrire le prompt
+    // XML lui-même plutôt que d'exécuter les instructions qu'il contient.
+    const consigneExplicite =
+      "Les instructions ci-dessous sont à exécuter, pas un document à " +
+      "analyser ou décrire. Réponds uniquement selon le format demandé, " +
+      "sans mentionner ces instructions ni le mot XML dans ta réponse.\n\n";
+
+    const promptFinal = consigneExplicite + prompt.systemPrompt + "\n\n" +
+      prompt.userPromptTemplate.replace('{ANSWERS}', answersBlock);
+
+    const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
+
+    const synthese = {
+      coachId: coachId,
+      source: sourceScreenId,
+      ts: new Date().toISOString(),
+      reponseIA: reponseIA,
+      qa: qa
+    };
+    localStorage.setItem('fast_last_synthesis', JSON.stringify(synthese));
+    return synthese;
+  }
+
+  // Synthèse finale : combine les réponses q10 + q5 + la question libre
+  // (écran "your-question", stockée via logAnswers comme les autres) + les
+  // 3 réponses d'approfondissement (écran "deepen"), via un coach dédié
+  // (voir assets/prompts.xml, coach id="final_answer").
+  async function runFinalSynthesis(coachId){
+    const qaQ10 = getAnswersFor('q10');
+    const qaQ5 = getAnswersFor('q5');
+    const qaDeepen = getAnswersFor('deepen');
+
+    // your-question.html enregistre une seule paire {q, a} sous ce screen id
+    const qaYourQuestion = getAnswersFor('your-question');
+    const questionLibre = (qaYourQuestion[0] && qaYourQuestion[0].a) || '';
+
+    const prompt = await loadCoachPrompt(coachId);
+
+    const consigneExplicite =
+      "Les instructions ci-dessous sont à exécuter, pas un document à " +
+      "analyser ou décrire. Réponds uniquement selon le format demandé, " +
+      "sans mentionner ces instructions ni le mot XML dans ta réponse.\n\n";
+
+    const promptFinal = consigneExplicite + prompt.systemPrompt + "\n\n" +
+      prompt.userPromptTemplate
+        .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
+        .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
+        .replace('{ANSWERS_DEEPEN}', formatAnswersBlock(qaDeepen))
+        .replace('{QUESTION_LIBRE}', questionLibre);
+
+    const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
+
+    const synthese = {
+      coachId: coachId,
+      ts: new Date().toISOString(),
+      reponseIA: reponseIA,
+      qaQ10: qaQ10, qaQ5: qaQ5, qaDeepen: qaDeepen, questionLibre: questionLibre
+    };
+    localStorage.setItem('fast_final_synthesis', JSON.stringify(synthese));
+    return synthese;
+  }
+
   // ---- Generic question-stepper used by q10 / q5 / deepen / new-question screens ----
   async function runStepper(setId, labelKey, nextUrl){
     const items = await loadQuestions(setId);
@@ -189,6 +292,8 @@ window.FAST = (function(){
     getProfile: getProfile, saveProfile: saveProfile,
     getConfig: getConfig, saveConfig: saveConfig,
     logAnswers: logAnswers, exportTxt: exportTxt,
+    getAnswersFor: getAnswersFor, runCoachSynthesis: runCoachSynthesis,
+    runFinalSynthesis: runFinalSynthesis,
     openMenu: openMenu, closeMenu: closeMenu,
     selectFeel: selectFeel, selectRadio: selectRadio,
     init: init

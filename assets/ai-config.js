@@ -19,12 +19,13 @@ window.FAST_AI_CONFIG = {
   // un prototype/démo, jamais pour un déploiement public avec une clé
   // payante active.
   ANTHROPIC: {
-    API_KEY: "sk-ant-api03-DDDD",
+    API_KEY: "DDDD",
     MODELE: "claude-sonnet-4-6"
     //
   },
   OPENAI: {
-    API_KEY: "   MODELE: "gpt-4o-mini"
+    API_KEY: "OOO",
+   MODELE: "gpt-4o-mini"
     
   },
   GEMINI: {

@@ -58,9 +58,24 @@ document.addEventListener('DOMContentLoaded', async function(){
   const boutonContinuer = document.getElementById('results-continuer');
 
   try{
+    // Vérifie si une synthèse déjà calculée correspond exactement aux
+    // réponses actuelles de Q10 : si oui, on l'affiche sans rappeler l'IA.
+    const qaQ10Actuelles = FAST.getAnswersFor('q10');
+    const cacheBrut = localStorage.getItem('fast_last_synthesis');
+    let synthese = null;
+
+    if(cacheBrut){
+      const cache = JSON.parse(cacheBrut);
+      const memeCoach = cache.coachId === 'executive';
+      const memesReponses = JSON.stringify(cache.qa) === JSON.stringify(qaQ10Actuelles);
+      if(memeCoach && memesReponses) synthese = cache;
+    }
+
     // 'executive' = id du coach dans assets/prompts.xml
     // 'q10' = set de questions dont les réponses servent d'input
-    const synthese = await FAST.runCoachSynthesis('executive', 'q10');
+    if(!synthese){
+      synthese = await FAST.runCoachSynthesis('executive', 'q10');
+    }
 
     chargement.style.display = 'none';
     contenu.style.display = 'block';

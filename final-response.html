@@ -57,9 +57,34 @@ document.addEventListener('DOMContentLoaded', async function(){
   const boutonContinuer = document.getElementById('final-continuer');
 
   try{
+    // Vérifie si une synthèse finale déjà calculée correspond exactement
+    // aux réponses actuelles (Q10 + Q5 + question libre + deepen) : si
+    // oui, on l'affiche sans rappeler l'IA.
+    const qaQ10Actuelles = FAST.getAnswersFor('q10');
+    const qaQ5Actuelles = FAST.getAnswersFor('q5');
+    const qaDeepenActuelles = FAST.getAnswersFor('deepen');
+    const qaYourQuestionActuelles = FAST.getAnswersFor('your-question');
+    const questionLibreActuelle = (qaYourQuestionActuelles[0] && qaYourQuestionActuelles[0].a) || '';
+
+    const cacheBrut = localStorage.getItem('fast_final_synthesis');
+    let synthese = null;
+
+    if(cacheBrut){
+      const cache = JSON.parse(cacheBrut);
+      const memeCoach = cache.coachId === 'final_answer';
+      const memesReponses =
+        JSON.stringify(cache.qaQ10) === JSON.stringify(qaQ10Actuelles) &&
+        JSON.stringify(cache.qaQ5) === JSON.stringify(qaQ5Actuelles) &&
+        JSON.stringify(cache.qaDeepen) === JSON.stringify(qaDeepenActuelles) &&
+        cache.questionLibre === questionLibreActuelle;
+      if(memeCoach && memesReponses) synthese = cache;
+    }
+
     // 'final_answer' = id du coach dans assets/prompts.xml
     // combine automatiquement les réponses q10 + q5 + la question libre
-    const synthese = await FAST.runFinalSynthesis('final_answer');
+    if(!synthese){
+      synthese = await FAST.runFinalSynthesis('final_answer');
+    }
 
     chargement.style.display = 'none';
     contenu.style.display = 'block';

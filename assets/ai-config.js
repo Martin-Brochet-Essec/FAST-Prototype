@@ -12,7 +12,7 @@ window.FAST_AI_CONFIG = {
 
   // false = appel direct au fournisseur depuis ce navigateur (clé visible).
   // true  = passe par un relais serverless qui cache la clé (voir /relais-ia).
-  UTILISER_RELAIS: false,
+  UTILISER_RELAIS: true,
   URL_RELAIS: "https://bold-math-50b2-relais-ia-fast-project.b00830790.workers.dev",
 
   // ⚠️ Visibles côté client si UTILISER_RELAIS = false : uniquement pour

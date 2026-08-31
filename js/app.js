@@ -8,7 +8,7 @@
 //  - "writes a text file" the only way a browser page safely can: it generates the file
 //    in memory and triggers a real download, named with date, time and the user's name.
 //  - profile / preferences are kept in localStorage, standing in for the requested XML
-//    file (same limitation: no direct disk writes from a browser page).
+//    file (same limitation: no direct disk writes from a browser page). 
 
 window.FAST = (function(){
   function getLang(){ return localStorage.getItem('fast_lang') || 'fr'; }

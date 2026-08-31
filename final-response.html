@@ -44,6 +44,7 @@
   </section>
 </div>
 <script src="assets/fallback.js"></script>
+<script src="assets/flow-config.js"></script>
 <script src="assets/ai-config.js"></script>
 <script src="assets/ai.js"></script>
 <script src="assets/app.js"></script>
@@ -84,6 +85,14 @@ document.addEventListener('DOMContentLoaded', async function(){
     // combine automatiquement les réponses q10 + q5 + la question libre
     if(!synthese){
       synthese = await FAST.runFinalSynthesis('final_answer');
+    }
+
+    // Selon assets/flow-config.js : soit on affiche la réponse ici, soit on
+    // simule son envoi par email et on redirige vers cet écran de
+    // confirmation (aucun email n'est réellement envoyé, site statique).
+    if(window.FAST_FLOW_CONFIG && window.FAST_FLOW_CONFIG.MODE_FINAL === 'email'){
+      window.location.href = 'email-sent.html';
+      return;
     }
 
     chargement.style.display = 'none';

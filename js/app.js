@@ -9,6 +9,7 @@
 //    in memory and triggers a real download, named with date, time and the user's name.
 //  - profile / preferences are kept in localStorage, standing in for the requested XML
 //    file (same limitation: no direct disk writes from a browser page). 
+// test-deploiement-123
 
 window.FAST = (function(){
   function getLang(){ return localStorage.getItem('fast_lang') || 'fr'; }

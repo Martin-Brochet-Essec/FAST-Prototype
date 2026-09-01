@@ -511,7 +511,7 @@
       <other label="Autre, précisez"/>
     </question>
 
-    <question type="single_choice" required="true">
+    <question type="multi_choice" required="true" min="1" max="3">
       <text>Qu'est-ce qui vous ferait dire, dans 3 mois, que la situation a changé ?</text>
       <options>
         <option>Promotion obtenue</option>
@@ -568,7 +568,7 @@
       <other label="Other, please specify"/>
     </question>
 
-    <question type="single_choice" required="true">
+    <question type="multi_choice" required="true" min="1" max="3">
       <text>What would tell you, in 3 months, that things have changed?</text>
       <options>
         <option>Got promoted</option>
@@ -625,7 +625,7 @@
       <other label="Otro, especifica"/>
     </question>
 
-    <question type="single_choice" required="true">
+    <question type="multi_choice" required="true" min="1" max="3">
       <text>¿Qué te haría decir, dentro de 3 meses, que la situación ha cambiado?</text>
       <options>
         <option>Ascenso conseguido</option>
@@ -682,7 +682,7 @@
       <other label="Altceva, precizează"/>
     </question>
 
-    <question type="single_choice" required="true">
+    <question type="multi_choice" required="true" min="1" max="3">
       <text>Ce te-ar face să spui, peste 3 luni, că situația s-a schimbat?</text>
       <options>
         <option>Promovare obținută</option>

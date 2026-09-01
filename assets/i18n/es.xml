@@ -175,4 +175,25 @@
   <string key="diag_d4_body">Lo que hicieron distinto las mujeres que superaron este punto: documentaron sus resultados antes de negociarlos.</string>
   <string key="diag_d5_title">Día 5 — Síntesis</string>
   <string key="diag_d5_body">Último día: preparamos el informe que recibirás este fin de semana, con tu eje de trabajo recomendado.</string>
+  <string key="results_eyebrow">Tu síntesis</string>
+  <string key="results_chargement">Analizando tus respuestas...</string>
+  <string key="results_synthese_title">Lo que entendemos</string>
+  <string key="results_note">Algunos detalles más nos ayudarán a afinar esta primera lectura.</string>
+  <string key="results_continuer">Continuar</string>
+  <string key="final_eyebrow">Nuestra respuesta</string>
+  <string key="final_chargement">Preparando tu respuesta a partir de todo lo que has compartido...</string>
+  <string key="final_titre">Nuestro consejo</string>
+  <string key="final_continuer">Volver al inicio</string>
+  <string key="deepen_generation">Preparando 3 preguntas para entender bien tu situación...</string>
+  <string key="reb_eyebrow">Tu perfil, con más precisión</string>
+  <string key="reb_chargement">Cruzando tus respuestas para afinar tu perfil...</string>
+  <string key="reb_synthese_title">Lo que precisamos</string>
+  <string key="reb_note">Ahora puedes hacernos la pregunta que te preocupa hoy.</string>
+  <string key="reb_continuer">Hacer mi pregunta</string>
+  <string key="wb_eyebrow">Bienvenida de nuevo</string>
+  <string key="wb_h1">Ya te conocemos</string>
+  <string key="wb_lead">Ya respondiste a las 10 y 5 preguntas de perfil. Vayamos directamente a tu pregunta de hoy.</string>
+  <string key="wb_continuer">Hacer mi pregunta</string>
+  <string key="wb_modifier">Quiero modificar mis respuestas</string>
+  <string key="wb_refaire">Rehacer mi perfil desde cero</string>
 </i18n>

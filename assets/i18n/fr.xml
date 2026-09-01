@@ -175,4 +175,25 @@
   <string key="diag_d4_body">Ce que les femmes qui ont dépassé ce point ont fait différemment : elles ont documenté leurs résultats avant de les négocier.</string>
   <string key="diag_d5_title">Jour 5 — Synthèse</string>
   <string key="diag_d5_body">Dernier jour : on prépare le rapport envoyé ce week-end, avec votre axe de travail recommandé.</string>
+  <string key="results_eyebrow">Votre synthèse</string>
+  <string key="results_chargement">Nous analysons vos réponses...</string>
+  <string key="results_synthese_title">Ce que nous comprenons</string>
+  <string key="results_note">Quelques précisions supplémentaires vont nous aider à affiner cette première lecture.</string>
+  <string key="results_continuer">Continuer</string>
+  <string key="final_eyebrow">Notre réponse</string>
+  <string key="final_chargement">Nous préparons votre réponse à partir de l'ensemble de vos réponses...</string>
+  <string key="final_titre">Notre conseil</string>
+  <string key="final_continuer">Retour à l'accueil</string>
+  <string key="deepen_generation">Nous préparons 3 questions pour bien cerner votre situation...</string>
+  <string key="reb_eyebrow">Votre profil, plus précisément</string>
+  <string key="reb_chargement">Nous croisons vos réponses pour affiner votre profil...</string>
+  <string key="reb_synthese_title">Ce que nous précisons</string>
+  <string key="reb_note">Vous pouvez maintenant nous poser la question qui vous préoccupe aujourd'hui.</string>
+  <string key="reb_continuer">Poser ma question</string>
+  <string key="wb_eyebrow">Bon retour</string>
+  <string key="wb_h1">On vous connaît déjà</string>
+  <string key="wb_lead">Vous avez déjà répondu aux 10 et 5 questions de profil. Passons directement à votre question du jour.</string>
+  <string key="wb_continuer">Poser ma question</string>
+  <string key="wb_modifier">Je veux modifier mes réponses</string>
+  <string key="wb_refaire">Refaire mon profil depuis le début</string>
 </i18n>

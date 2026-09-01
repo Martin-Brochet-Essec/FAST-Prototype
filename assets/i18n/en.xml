@@ -175,4 +175,25 @@
   <string key="diag_d4_body">What women who moved past this point did differently: they documented their results before negotiating them.</string>
   <string key="diag_d5_title">Day 5 — Summary</string>
   <string key="diag_d5_body">Last day: we're preparing the report sent this weekend, with your recommended focus area.</string>
+  <string key="results_eyebrow">Your summary</string>
+  <string key="results_chargement">Analyzing your answers...</string>
+  <string key="results_synthese_title">What we understand</string>
+  <string key="results_note">A few more details will help us refine this first read.</string>
+  <string key="results_continuer">Continue</string>
+  <string key="final_eyebrow">Our answer</string>
+  <string key="final_chargement">Preparing your answer based on everything you've shared...</string>
+  <string key="final_titre">Our advice</string>
+  <string key="final_continuer">Back to home</string>
+  <string key="deepen_generation">Preparing 3 questions to fully understand your situation...</string>
+  <string key="reb_eyebrow">Your profile, more precisely</string>
+  <string key="reb_chargement">Cross-checking your answers to refine your profile...</string>
+  <string key="reb_synthese_title">What we're refining</string>
+  <string key="reb_note">You can now ask us the question that's on your mind today.</string>
+  <string key="reb_continuer">Ask my question</string>
+  <string key="wb_eyebrow">Welcome back</string>
+  <string key="wb_h1">We already know you</string>
+  <string key="wb_lead">You've already answered the 10 and 5 profile questions. Let's go straight to your question today.</string>
+  <string key="wb_continuer">Ask my question</string>
+  <string key="wb_modifier">I want to edit my answers</string>
+  <string key="wb_refaire">Redo my profile from scratch</string>
 </i18n>

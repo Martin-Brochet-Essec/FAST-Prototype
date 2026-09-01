@@ -175,4 +175,25 @@
   <string key="diag_d4_body">Ce au făcut diferit femeile care au depășit acest punct: și-au documentat rezultatele înainte de a le negocia.</string>
   <string key="diag_d5_title">Ziua 5 — Sinteză</string>
   <string key="diag_d5_body">Ultima zi: pregătim raportul trimis în acest weekend, cu direcția de lucru recomandată.</string>
+  <string key="results_eyebrow">Sinteza ta</string>
+  <string key="results_chargement">Analizăm răspunsurile tale...</string>
+  <string key="results_synthese_title">Ce înțelegem</string>
+  <string key="results_note">Câteva detalii în plus ne vor ajuta să rafinăm această primă lectură.</string>
+  <string key="results_continuer">Continuă</string>
+  <string key="final_eyebrow">Răspunsul nostru</string>
+  <string key="final_chargement">Pregătim răspunsul tău pe baza a tot ce ai împărtășit...</string>
+  <string key="final_titre">Sfatul nostru</string>
+  <string key="final_continuer">Înapoi acasă</string>
+  <string key="deepen_generation">Pregătim 3 întrebări pentru a înțelege bine situația ta...</string>
+  <string key="reb_eyebrow">Profilul tău, mai precis</string>
+  <string key="reb_chargement">Analizăm răspunsurile tale pentru a rafina profilul...</string>
+  <string key="reb_synthese_title">Ce rafinăm</string>
+  <string key="reb_note">Acum ne poți pune întrebarea care te preocupă astăzi.</string>
+  <string key="reb_continuer">Pun întrebarea mea</string>
+  <string key="wb_eyebrow">Bine ai revenit</string>
+  <string key="wb_h1">Te cunoaștem deja</string>
+  <string key="wb_lead">Ai răspuns deja la cele 10 și 5 întrebări de profil. Trecem direct la întrebarea ta de azi.</string>
+  <string key="wb_continuer">Pun întrebarea mea</string>
+  <string key="wb_modifier">Vreau să-mi modific răspunsurile</string>
+  <string key="wb_refaire">Refă profilul de la început</string>
 </i18n>

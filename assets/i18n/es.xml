@@ -200,4 +200,6 @@
   <string key="choix_possibles_label">Opciones posibles</string>
   <string key="choix_possibles_a">a</string>
   <string key="choix_possibles_tous">todas</string>
+  <string key="oui_label">Sí</string>
+  <string key="non_label">No</string>
 </i18n>

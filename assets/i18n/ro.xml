@@ -200,4 +200,6 @@
   <string key="choix_possibles_label">Alegeri posibile</string>
   <string key="choix_possibles_a">la</string>
   <string key="choix_possibles_tous">toate</string>
+  <string key="oui_label">Da</string>
+  <string key="non_label">Nu</string>
 </i18n>

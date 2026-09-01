@@ -138,11 +138,17 @@ window.FAST = (function(){
       if(mValeur) etat.echelle = parseInt(mValeur[1], 10);
 
     } else if(item.type === 'yes_no'){
-      if(texte.indexOf('Oui') === 0){
+      // On accepte les 4 variantes connues (la réponse a pu être donnée
+      // dans une autre langue que celle actuellement affichée).
+      const VARIANTES_OUI = ['Oui', 'Yes', 'Sí', 'Da'];
+      const VARIANTES_NON = ['Non', 'No', 'Nu'];
+      const debutOui = VARIANTES_OUI.find(v => texte.indexOf(v) === 0);
+      const debutNon = VARIANTES_NON.find(v => texte.indexOf(v) === 0);
+      if(debutOui){
         etat.ouiNon = true;
-        const m = texte.match(/^Oui — (.*)$/);
+        const m = texte.match(/ — (.*)$/);
         if(m) etat.precisionOuiNon = m[1];
-      } else if(texte.indexOf('Non') === 0){
+      } else if(debutNon){
         etat.ouiNon = false;
       }
     }
@@ -592,7 +598,10 @@ window.FAST = (function(){
           }
           if(etat.remarque) a += (a ? ' — ' : '') + 'Remarque : ' + etat.remarque;
         } else if(item.type === 'yes_no'){
-          a = etat.ouiNon === true ? 'Oui' : (etat.ouiNon === false ? 'Non' : '');
+          const dOuiNon = dict();
+          const libOui = dOuiNon.oui_label || 'Oui';
+          const libNon = dOuiNon.non_label || 'Non';
+          a = etat.ouiNon === true ? libOui : (etat.ouiNon === false ? libNon : '');
           if(etat.ouiNon === true && etat.precisionOuiNon) a += ' — ' + etat.precisionOuiNon;
         }
         qa[i] = { q: item.text, a: a };
@@ -752,9 +761,10 @@ window.FAST = (function(){
         recalculerReponse();
 
       } else if(item.type === 'yes_no'){
+        const d = dict();
         const rangee = document.createElement('div');
         rangee.style.cssText = 'display:flex; gap:10px; margin:8px 0;';
-        [['Oui', true], ['Non', false]].forEach(function(paire){
+        [[d.oui_label || 'Oui', true], [d.non_label || 'Non', false]].forEach(function(paire){
           const label = paire[0], val = paire[1];
           const actif = etat.ouiNon === val;
           const bouton = document.createElement('button');

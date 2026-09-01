@@ -30,6 +30,7 @@
 <div class="card">
   <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 8px;" data-i18n="whoami_section_summary">Résumé collecté</h3>
   <p class="summary-box" id="summaryText" data-i18n="whoami_summary_placeholder">Votre résumé apparaîtra ici au fil de vos réponses aux questions de profiling.</p>
+  <button class="btn btn-ghost" id="whoami-modifier" data-i18n="whoami_modifier" style="margin-top:10px; display:none;">Modifier mes réponses (Q10 + Q5)</button>
 </div>
 <div class="card">
   <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 8px;" data-i18n="whoami_section_milestones">Parcours & jalons atteints</h3>
@@ -48,12 +49,32 @@
 <script src="assets/app.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  var all = JSON.parse(localStorage.getItem('fast_answers')||'[]');
-  if(all.length){
-    var lines = [];
-    all.forEach(function(entry){ entry.qa.forEach(function(q){ if(q.a) lines.push(q.a); }); });
-    if(lines.length) document.getElementById('summaryText').textContent = lines.slice(-4).join(' • ');
+  // Priorité à la synthèse Q10+Q5 (results-even-better.html). À défaut,
+  // on retombe sur la synthèse Q10 seule (results.html). Sinon, le
+  // placeholder par défaut reste affiché.
+  var approfondie = JSON.parse(localStorage.getItem('fast_profile_deepening') || 'null');
+  var basique = JSON.parse(localStorage.getItem('fast_last_synthesis') || 'null');
+  var synthese = (approfondie && approfondie.reponseIA) ? approfondie.reponseIA
+               : (basique && basique.reponseIA) ? basique.reponseIA
+               : null;
+
+  if(synthese){
+    document.getElementById('summaryText').textContent = synthese;
   }
+
+  // Le bouton "modifier" n'a de sens que si Q10 (au moins) a déjà été fait.
+  if(FAST.getAnswersFor('q10').length > 0){
+    var boutonModifier = document.getElementById('whoami-modifier');
+    boutonModifier.style.display = 'inline-block';
+    boutonModifier.addEventListener('click', function(){
+      // ?edit=1 : q10.html reprend les réponses existantes (brouillon
+      // conservé) au lieu de repartir de zéro, puis renchaîne normalement
+      // sur Q5 et les synthèses IA associées, qui seront recalculées si
+      // les réponses changent.
+      window.location.href = 'q10.html?edit=1';
+    });
+  }
+
   document.getElementById('correctionSave').addEventListener('click', function(){
     var note = document.getElementById('correction').value;
     FAST.logAnswers('who-am-i-correction', [{q: 'Correction manuelle', a: note}]);

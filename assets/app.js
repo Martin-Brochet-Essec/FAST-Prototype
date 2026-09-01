@@ -194,6 +194,23 @@ window.FAST = (function(){
     return entry ? entry.qa : [];
   }
 
+  // Mémoire "moyen terme" : le profil (Q10+Q5) est-il déjà complet ?
+  // Utilisé pour sauter directement à your-question.html et afficher
+  // "on vous connaît déjà" plutôt que de reposer les mêmes questions.
+  function hasCompletedProfile(){
+    return getAnswersFor('q10').length > 0 && getAnswersFor('q5').length > 0;
+  }
+
+  // Efface tout ce qui dépend du profil (réponses + synthèses IA en cache +
+  // brouillons en cours) — utilisé par le bouton "Refaire le profil".
+  function clearProfileData(){
+    const all = JSON.parse(localStorage.getItem('fast_answers') || '[]');
+    const nettoye = all.filter(e => !['q10', 'q5', 'deepen', 'your-question'].includes(e.screen));
+    localStorage.setItem('fast_answers', JSON.stringify(nettoye));
+    ['fast_last_synthesis', 'fast_profile_deepening', 'fast_deepen_questions', 'fast_final_synthesis',
+     'fast_draft_q10', 'fast_draft_q5', 'fast_draft_deepen'].forEach(k => localStorage.removeItem(k));
+  }
+
   // Réponses vides = section clairement signalée plutôt que silencieusement
   // absente du prompt (utile pour diagnostiquer, et plus honnête envers l'IA).
   function formatAnswersBlock(qaPairs){
@@ -593,20 +610,60 @@ window.FAST = (function(){
         recalculerReponse();
 
       } else if(item.type === 'scale'){
-        const rangee = document.createElement('div');
-        rangee.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;';
-        for(let v = item.scaleMin; v <= item.scaleMax; v++){
-          const bouton = document.createElement('button');
-          bouton.type = 'button';
-          const actif = etat.echelle === v;
-          bouton.textContent = v + (item.scaleLabels[String(v)] ? ' · ' + item.scaleLabels[String(v)] : '');
-          bouton.style.cssText = 'padding:8px 10px; border-radius:8px; border:1px solid ' + (actif ? 'var(--rose-deep)' : '#ccc') +
-            '; background:' + (actif ? 'var(--rose-deep)' : '#fff') + '; color:' + (actif ? '#fff' : 'inherit') +
-            '; font-size:12.5px; cursor:pointer;';
-          bouton.addEventListener('click', function(){ etat.echelle = v; renderStructuree(item); });
-          rangee.appendChild(bouton);
+        const estEchelleSentiment = (item.scaleMin === -3 && item.scaleMax === 3);
+
+        if(estEchelleSentiment){
+          // Échelle graphique : emoji + dégradé de couleur rouge -> vert,
+          // avec le libellé du niveau choisi affiché en gros en dessous.
+          const EMOJIS = { '-3':'😠', '-2':'🙁', '-1':'😕', '0':'😐', '1':'🙂', '2':'😊', '3':'🤩' };
+          const COULEURS = { '-3':'#c0392b', '-2':'#e67e22', '-1':'#f0ad4e', '0':'#95a5a6', '1':'#7fb069', '2':'#27ae60', '3':'#1e8449' };
+
+          const rangee = document.createElement('div');
+          rangee.style.cssText = 'display:flex; justify-content:space-between; gap:4px; margin:10px 0 4px;';
+          for(let v = item.scaleMin; v <= item.scaleMax; v++){
+            const actif = etat.echelle === v;
+            const couleur = COULEURS[String(v)];
+            const bouton = document.createElement('button');
+            bouton.type = 'button';
+            bouton.textContent = EMOJIS[String(v)];
+            bouton.style.cssText = 'flex:1; font-size:' + (actif ? '26px' : '20px') +
+              '; padding:8px 2px; border-radius:10px; border:2px solid ' + (actif ? couleur : 'transparent') +
+              '; background:' + (actif ? couleur + '22' : '#f5f5f5') +
+              '; cursor:pointer; transition:all .15s;';
+            bouton.addEventListener('click', function(){ etat.echelle = v; renderStructuree(item); });
+            rangee.appendChild(bouton);
+          }
+          optionsEl.appendChild(rangee);
+
+          // Piste dégradée sous les emoji, purement visuelle
+          const piste = document.createElement('div');
+          piste.style.cssText = 'height:6px; border-radius:3px; margin:2px 0 10px; background:linear-gradient(90deg, #c0392b, #e67e22, #f0ad4e, #95a5a6, #7fb069, #27ae60, #1e8449);';
+          optionsEl.insertBefore(piste, rangee.nextSibling);
+
+          if(etat.echelle !== null && etat.echelle !== undefined){
+            const libelle = document.createElement('p');
+            libelle.style.cssText = 'text-align:center; font-weight:600; font-size:14px; margin:0 0 10px; color:' + COULEURS[String(etat.echelle)] + ';';
+            libelle.textContent = (item.scaleLabels[String(etat.echelle)] || String(etat.echelle));
+            optionsEl.appendChild(libelle);
+          }
+
+        } else {
+          // Échelle numérique simple (ex: légitimité 1 à 5), sans dégradé.
+          const rangee = document.createElement('div');
+          rangee.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;';
+          for(let v = item.scaleMin; v <= item.scaleMax; v++){
+            const bouton = document.createElement('button');
+            bouton.type = 'button';
+            const actif = etat.echelle === v;
+            bouton.textContent = v + (item.scaleLabels[String(v)] ? ' · ' + item.scaleLabels[String(v)] : '');
+            bouton.style.cssText = 'padding:8px 10px; border-radius:8px; border:1px solid ' + (actif ? 'var(--rose-deep)' : '#ccc') +
+              '; background:' + (actif ? 'var(--rose-deep)' : '#fff') + '; color:' + (actif ? '#fff' : 'inherit') +
+              '; font-size:12.5px; cursor:pointer;';
+            bouton.addEventListener('click', function(){ etat.echelle = v; renderStructuree(item); });
+            rangee.appendChild(bouton);
+          }
+          optionsEl.appendChild(rangee);
         }
-        optionsEl.appendChild(rangee);
 
         if(item.remark){
           optionsEl.appendChild(champTexte(etat.remarque, item.remark.label, function(v){
@@ -665,7 +722,9 @@ window.FAST = (function(){
       if(i < items.length - 1){ i++; sauverBrouillon(); render(); }
       else{
         logAnswers(screenId, qa);
-        localStorage.removeItem(draftKey);
+        sauverBrouillon(); // on garde volontairement le brouillon : un retour
+        // ultérieur sur cet écran (ex: depuis results.html) doit retrouver
+        // exactement ces réponses, pas repartir de zéro.
         window.location.href = nextUrl;
       }
     });
@@ -704,6 +763,7 @@ window.FAST = (function(){
     getConfig: getConfig, saveConfig: saveConfig,
     logAnswers: logAnswers, exportTxt: exportTxt,
     getAnswersFor: getAnswersFor, runCoachSynthesis: runCoachSynthesis,
+    hasCompletedProfile: hasCompletedProfile, clearProfileData: clearProfileData,
     runFinalSynthesis: runFinalSynthesis,
     runProfileDeepening: runProfileDeepening,
     generateDeepenQuestions: generateDeepenQuestions,

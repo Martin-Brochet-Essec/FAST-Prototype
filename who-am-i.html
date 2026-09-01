@@ -46,31 +46,59 @@
   </section>
 </div>
 <script src="assets/fallback.js"></script>
+<script src="assets/ai-config.js"></script>
+<script src="assets/ai.js"></script>
 <script src="assets/app.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-  // Priorité à la synthèse Q10+Q5 (results-even-better.html). À défaut,
-  // on retombe sur la synthèse Q10 seule (results.html). Sinon, le
-  // placeholder par défaut reste affiché.
-  var approfondie = JSON.parse(localStorage.getItem('fast_profile_deepening') || 'null');
-  var basique = JSON.parse(localStorage.getItem('fast_last_synthesis') || 'null');
-  var synthese = (approfondie && approfondie.reponseIA) ? approfondie.reponseIA
-               : (basique && basique.reponseIA) ? basique.reponseIA
-               : null;
+document.addEventListener('DOMContentLoaded', async function(){
+  const summaryEl = document.getElementById('summaryText');
+  const boutonModifier = document.getElementById('whoami-modifier');
 
-  if(synthese){
-    document.getElementById('summaryText').textContent = synthese;
+  // Affiche la synthèse Q10+Q5 (ou Q10 seul si Q5 pas encore fait), en la
+  // recalculant si les réponses stockées ne correspondent plus au cache
+  // (ex: Q10 modifié sans être allée jusqu'au bout du parcours Q5).
+  async function chargerResume(){
+    const qaQ10 = FAST.getAnswersFor('q10');
+    const qaQ5 = FAST.getAnswersFor('q5');
+    if(qaQ10.length === 0) return; // rien à afficher, on garde le placeholder
+
+    try{
+      if(qaQ5.length > 0){
+        const cacheBrut = localStorage.getItem('fast_profile_deepening');
+        let synthese = null;
+        if(cacheBrut){
+          const cache = JSON.parse(cacheBrut);
+          if(cache.coachId === 'profile_deepening' &&
+             JSON.stringify(cache.qaQ10) === JSON.stringify(qaQ10) &&
+             JSON.stringify(cache.qaQ5) === JSON.stringify(qaQ5)){
+            synthese = cache;
+          }
+        }
+        if(!synthese) synthese = await FAST.runProfileDeepening('profile_deepening');
+        summaryEl.textContent = synthese.reponseIA;
+
+      } else {
+        const cacheBrut = localStorage.getItem('fast_last_synthesis');
+        let synthese = null;
+        if(cacheBrut){
+          const cache = JSON.parse(cacheBrut);
+          if(cache.coachId === 'executive' && JSON.stringify(cache.qa) === JSON.stringify(qaQ10)){
+            synthese = cache;
+          }
+        }
+        if(!synthese) synthese = await FAST.runCoachSynthesis('executive', 'q10');
+        summaryEl.textContent = synthese.reponseIA;
+      }
+    }catch(erreur){
+      summaryEl.textContent = 'Erreur : ' + erreur.message;
+    }
   }
 
-  // Le bouton "modifier" n'a de sens que si Q10 (au moins) a déjà été fait.
+  await chargerResume();
+
   if(FAST.getAnswersFor('q10').length > 0){
-    var boutonModifier = document.getElementById('whoami-modifier');
     boutonModifier.style.display = 'inline-block';
     boutonModifier.addEventListener('click', function(){
-      // ?edit=1 : q10.html reprend les réponses existantes (brouillon
-      // conservé) au lieu de repartir de zéro, puis renchaîne normalement
-      // sur Q5 et les synthèses IA associées, qui seront recalculées si
-      // les réponses changent.
       window.location.href = 'q10.html?edit=1';
     });
   }

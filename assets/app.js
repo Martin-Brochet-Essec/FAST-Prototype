@@ -100,6 +100,55 @@ window.FAST = (function(){
     return q;
   }
 
+  function echapperRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  // Reconstruit un "état" d'édition (sélections, échelle, oui/non...) à
+  // partir d'une réponse déjà enregistrée en texte (qa[i].a) — utilisé
+  // quand on rouvre une question structurée pour la modifier mais qu'aucun
+  // brouillon compatible n'existe (ex: les questions ont changé de forme
+  // depuis la dernière réponse).
+  function reconstruireEtat(item, texte){
+    const etat = { selection: [], autreActive: false, autreTexte: '', echelle: null, remarque: '', ouiNon: null, precisionOuiNon: '' };
+    if(!texte) return etat;
+
+    if(item.type === 'single_choice' || item.type === 'multi_choice'){
+      let reste = texte;
+      (item.options || []).forEach(function(o){
+        if(o.needsPrecision){
+          const re = new RegExp('\\(' + echapperRegExp(o.label) + ' : (.*?)\\)');
+          const m = reste.match(re);
+          if(m){ etat['precision_' + o.label] = m[1]; reste = reste.replace(m[0], '').trim(); }
+        }
+      });
+      reste.split(',').map(p => p.trim()).filter(Boolean).forEach(function(p){
+        if(p.indexOf('Autre : ') === 0){
+          etat.autreActive = true;
+          etat.autreTexte = p.substring('Autre : '.length).trim();
+        } else {
+          const opt = (item.options || []).find(o => o.label === p);
+          if(opt) etat.selection.push(opt.label);
+        }
+      });
+
+    } else if(item.type === 'scale'){
+      let reste = texte;
+      const mRemarque = reste.match(/ — Remarque : (.*)$/);
+      if(mRemarque){ etat.remarque = mRemarque[1]; reste = reste.slice(0, mRemarque.index); }
+      const mValeur = reste.match(/^(-?\d+)/);
+      if(mValeur) etat.echelle = parseInt(mValeur[1], 10);
+
+    } else if(item.type === 'yes_no'){
+      if(texte.indexOf('Oui') === 0){
+        etat.ouiNon = true;
+        const m = texte.match(/^Oui — (.*)$/);
+        if(m) etat.precisionOuiNon = m[1];
+      } else if(texte.indexOf('Non') === 0){
+        etat.ouiNon = false;
+      }
+    }
+    return etat;
+  }
+
   async function loadQuestions(setId){
     const lang = getLang();
     let list = (window.FAST_FALLBACK_Q && window.FAST_FALLBACK_Q[setId] && window.FAST_FALLBACK_Q[setId][lang]) || [];
@@ -433,6 +482,22 @@ window.FAST = (function(){
         }
       }
     }catch(e){ /* brouillon corrompu : on repart de zéro sans bloquer */ }
+
+    // Si aucun brouillon compatible n'a été restauré (questions modifiées
+    // depuis, ou brouillon absent) mais que des réponses ont déjà été
+    // validées pour cet écran, on reconstruit l'état d'édition à partir de
+    // ces réponses plutôt que d'afficher un questionnaire vide.
+    const brouillonDejaRempli = qa.filter(Boolean).length > 0;
+    if(!brouillonDejaRempli){
+      const reponsesFinalisees = getAnswersFor(screenId);
+      if(reponsesFinalisees.length === items.length){
+        qa = reponsesFinalisees.map(r => ({ q: r.q, a: r.a }));
+        etats = items.map((item, idx) =>
+          (typeof item === 'object' && item !== null) ? reconstruireEtat(item, qa[idx].a) : undefined
+        );
+        i = 0;
+      }
+    }
 
     const textEl = document.getElementById('q-text');
     const answerEl = document.getElementById('q-answer');

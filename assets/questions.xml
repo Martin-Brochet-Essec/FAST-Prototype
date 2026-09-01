@@ -1,16 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <questions>
   <set id="q10" lang="fr">
-    <q id="1">Quel est votre secteur d'activité aujourd'hui ?</q>
-    <q id="2">Depuis combien de temps occupez-vous votre poste actuel ?</q>
-    <q id="3">Quel objectif de carrière visez-vous dans les 12 prochains mois ?</q>
-    <q id="4">Qu'est-ce qui vous semble le plus difficile à obtenir : reconnaissance, promotion, équilibre, ou confiance en vous ?</q>
-    <q id="5">Avez-vous des proches dont vous avez la charge au quotidien ?</q>
-    <q id="6">Comment décririez-vous le soutien de votre entourage dans votre vie professionnelle ?</q>
-    <q id="7">Votre manager vous donne-t-il de la visibilité sur des projets stratégiques ?</q>
-    <q id="8">Votre entreprise favorise-t-elle réellement l'accès des femmes aux postes de direction ?</q>
-    <q id="9">De 1 à 5, à quel point vous sentez-vous légitime dans vos ambitions actuelles ?</q>
-    <q id="10">Qu'est-ce qui vous a poussée à chercher de l'aide aujourd'hui ?</q>
+
+    <question type="single_choice" required="true">
+      <text>Quel est votre secteur d'activité aujourd'hui ?</text>
+      <options>
+        <option>Tech / IT</option>
+        <option>Finance</option>
+        <option>Santé</option>
+        <option>Industrie</option>
+        <option>Retail</option>
+        <option>Éducation</option>
+        <option>Conseil</option>
+        <option>Droit</option>
+        <option>Média</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="single_choice" required="true">
+      <text>Depuis combien de temps occupez-vous votre poste actuel ?</text>
+      <options>
+        <option>0-11 mois</option>
+        <option>1-2 ans</option>
+        <option>3-5 ans</option>
+        <option>6-10 ans</option>
+        <option>11-20 ans</option>
+        <option>20 ans et +</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1" max="3">
+      <text>Quel objectif de carrière visez-vous dans les 12 prochains mois ?</text>
+      <options>
+        <option>Obtenir une promotion</option>
+        <option>Évoluer vers un poste de direction</option>
+        <option>Changer de poste ou d'entreprise</option>
+        <option>Élargir mon réseau professionnel</option>
+        <option>Développer de nouvelles compétences</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1" max="3">
+      <text>Qu'est-ce qui vous semble le plus difficile à obtenir ?</text>
+      <options>
+        <option>Reconnaissance salariale</option>
+        <option>Promotion</option>
+        <option>Équilibre vie pro/perso</option>
+        <option>Confiance en vous</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1">
+      <text>Avez-vous des proches dont vous avez la charge au quotidien ?</text>
+      <options>
+        <option exclusive="true">Aucun</option>
+        <option>Enfant(s)</option>
+        <option>Conjoint(e)</option>
+        <option>Parents</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="scale" required="true">
+      <text>Comment décririez-vous le soutien de votre entourage dans votre vie professionnelle ?</text>
+      <scale min="-3" max="3">
+        <label value="-3">Ennemi</label>
+        <label value="-2">Me décourage</label>
+        <label value="-1">Ne m'écoute pas</label>
+        <label value="0">Neutre</label>
+        <label value="1">Supporter</label>
+        <label value="2">De grand conseil</label>
+        <label value="3">Ils se sacrifient pour moi</label>
+      </scale>
+      <remark label="Remarque, précisez" required="false"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1">
+      <text>Votre manager vous donne-t-il de la visibilité sur des projets stratégiques ?</text>
+      <options>
+        <option>Aucune visibilité</option>
+        <option>Informée après coup</option>
+        <option>Consultée ponctuellement</option>
+        <option>Impliquée dans les décisions</option>
+        <option>Pilote de projets stratégiques</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="single_choice" required="true">
+      <text>Votre entreprise favorise-t-elle réellement l'accès des femmes aux postes de direction ?</text>
+      <options>
+        <option>Oui</option>
+        <option>Non</option>
+        <option needs_precision="true" precision_label="Précisez">Cela dépend</option>
+      </options>
+    </question>
+
+    <question type="scale" required="true">
+      <text>De 1 à 5, à quel point vous sentez-vous légitime dans vos ambitions actuelles ?</text>
+      <scale min="1" max="5"></scale>
+      <remark label="Remarque, précisez" required="false"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1" max="3">
+      <text>Qu'est-ce qui vous a poussée à chercher de l'aide aujourd'hui ?</text>
+      <options>
+        <option>Me sentir bloquée professionnellement</option>
+        <option>Manque de reconnaissance</option>
+        <option>Besoin de prendre confiance</option>
+        <option>Envie de changer de trajectoire</option>
+        <option>Mieux concilier vie pro/perso</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
   </set>
   <set id="q10" lang="en">
     <q id="1">What's your industry today?</q>
@@ -49,11 +156,61 @@
     <q id="10">Ce te-a determinat să cauți ajutor azi?</q>
   </set>
   <set id="q5" lang="fr">
-    <q id="1">Ce manque de visibilité : est-ce lié à votre manager, à votre réseau, ou aux deux ?</q>
-    <q id="2">Quand cette difficulté est-elle devenue plus pressante ?</q>
-    <q id="3">En avez-vous déjà parlé à quelqu'un en interne ?</q>
-    <q id="4">Qu'est-ce qui vous ferait dire, dans 3 mois, que la situation a changé ?</q>
-    <q id="5">Y a-t-il une dimension familiale qui pèse sur cette décision ?</q>
+
+    <question type="single_choice" required="true">
+      <text>Ce manque de visibilité : est-ce lié à votre manager, à votre réseau, ou aux deux ?</text>
+      <options>
+        <option>Mon manager</option>
+        <option>Mon réseau</option>
+        <option>Les deux</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="single_choice" required="true">
+      <text>Quand cette difficulté est-elle devenue plus pressante ?</text>
+      <options>
+        <option>0-11 mois</option>
+        <option>1-2 ans</option>
+        <option>3-5 ans</option>
+        <option>6-10 ans</option>
+        <option>10 ans et +</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="multi_choice" required="true" min="1" max="3">
+      <text>En avez-vous déjà parlé à quelqu'un en interne ?</text>
+      <options>
+        <option>RH</option>
+        <option>Manager</option>
+        <option>Collègues</option>
+        <option>Syndicat</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="single_choice" required="true">
+      <text>Qu'est-ce qui vous ferait dire, dans 3 mois, que la situation a changé ?</text>
+      <options>
+        <option>Promotion obtenue</option>
+        <option>Reconnaissance accrue</option>
+        <option>Meilleur équilibre</option>
+        <option>Confiance accrue</option>
+        <option>Nouveau poste</option>
+        <option>Salaire réévalué</option>
+        <option>Réseau élargi</option>
+        <option>Moins stressée</option>
+        <option>Rôle stratégique</option>
+      </options>
+      <other label="Autre, précisez"/>
+    </question>
+
+    <question type="yes_no" required="true">
+      <text>Y a-t-il une dimension familiale qui pèse sur cette décision ?</text>
+      <if_yes label="Précisez" required="true"/>
+    </question>
+
   </set>
   <set id="q5" lang="en">
     <q id="1">Is this lack of visibility about your manager, your network, or both?</q>

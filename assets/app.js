@@ -59,6 +59,47 @@ window.FAST = (function(){
     applyI18n();
   }
 
+  // Interprète un noeud <question> structuré (choix unique/multiple, échelle,
+  // oui/non) en objet JS exploitable par le rendu du stepper.
+  function parseStructuredQuestionNode(node){
+    const type = node.getAttribute('type');
+    const required = node.getAttribute('required') === 'true';
+    const text = (node.querySelector(':scope > text')?.textContent || '').trim();
+    const q = { type: type, required: required, text: text };
+
+    if(type === 'single_choice' || type === 'multi_choice'){
+      q.min = node.hasAttribute('min') ? parseInt(node.getAttribute('min'), 10) : (type === 'single_choice' ? 1 : 0);
+      q.max = node.hasAttribute('max') ? parseInt(node.getAttribute('max'), 10) : (type === 'single_choice' ? 1 : Infinity);
+      q.options = Array.from(node.querySelectorAll(':scope > options > option')).map(o => ({
+        label: o.textContent.trim(),
+        exclusive: o.getAttribute('exclusive') === 'true',
+        needsPrecision: o.getAttribute('needs_precision') === 'true',
+        precisionLabel: o.getAttribute('precision_label') || 'Précisez'
+      }));
+      const otherNode = node.querySelector(':scope > other');
+      q.other = otherNode ? { label: otherNode.getAttribute('label') || 'Autre, précisez' } : null;
+    }
+
+    if(type === 'scale'){
+      const scaleNode = node.querySelector(':scope > scale');
+      q.scaleMin = parseInt(scaleNode.getAttribute('min'), 10);
+      q.scaleMax = parseInt(scaleNode.getAttribute('max'), 10);
+      q.scaleLabels = {};
+      Array.from(scaleNode.querySelectorAll(':scope > label')).forEach(l => {
+        q.scaleLabels[l.getAttribute('value')] = l.textContent.trim();
+      });
+      const remarkNode = node.querySelector(':scope > remark');
+      q.remark = remarkNode ? { label: remarkNode.getAttribute('label') || 'Remarque, précisez', required: remarkNode.getAttribute('required') === 'true' } : null;
+    }
+
+    if(type === 'yes_no'){
+      const ifYes = node.querySelector(':scope > if_yes');
+      q.ifYes = ifYes ? { label: ifYes.getAttribute('label') || 'Précisez', required: ifYes.getAttribute('required') !== 'false' } : null;
+    }
+
+    return q;
+  }
+
   async function loadQuestions(setId){
     const lang = getLang();
     let list = (window.FAST_FALLBACK_Q && window.FAST_FALLBACK_Q[setId] && window.FAST_FALLBACK_Q[setId][lang]) || [];
@@ -70,8 +111,15 @@ window.FAST = (function(){
         const sets = Array.from(doc.querySelectorAll('set'));
         const set = sets.find(s => s.getAttribute('id') === setId && s.getAttribute('lang') === lang);
         if(set){
-          const items = Array.from(set.querySelectorAll('q')).map(n => n.textContent);
-          if(items.length) list = items;
+          // Format structuré (choix multiples, échelle, oui/non) si présent,
+          // sinon on retombe sur le format texte libre historique.
+          const structuredNodes = Array.from(set.querySelectorAll(':scope > question'));
+          if(structuredNodes.length){
+            list = structuredNodes.map(parseStructuredQuestionNode);
+          } else {
+            const items = Array.from(set.querySelectorAll(':scope > q')).map(n => n.textContent);
+            if(items.length) list = items;
+          }
         }
       }
     }catch(e){ /* file:// — keep fallback */ }
@@ -341,32 +389,285 @@ window.FAST = (function(){
   // ---- Generic question-stepper used by q10 / q5 / deepen / new-question screens ----
   // startStepper fait tourner le stepper sur une liste de questions déjà
   // connue (venant de questions.xml OU générée dynamiquement, ex: par l'IA).
+  // Chaque item peut être soit une simple chaîne (texte libre, comportement
+  // historique), soit un objet structuré (choix unique/multiple, échelle,
+  // oui/non — voir parseStructuredQuestionNode).
   // screenId sert de clé de stockage (logAnswers/getAnswersFor) — il peut
   // différer de la source des questions si besoin.
+  //
+  // Mémoire courte : les réponses en cours sont sauvegardées à chaque
+  // changement dans un brouillon (localStorage) et restaurées si l'écran
+  // est rechargé ou si l'utilisatrice revient en arrière avant d'avoir
+  // terminé — sans jamais régénérer les questions elles-mêmes.
   function startStepper(items, screenId, labelKey, nextUrl){
-    const qa = new Array(items.length);
+    const draftKey = 'fast_draft_' + screenId;
+    let qa = new Array(items.length);
+    let etats = new Array(items.length);
     let i = 0;
+
+    try{
+      const brut = localStorage.getItem(draftKey);
+      if(brut){
+        const draft = JSON.parse(brut);
+        if(JSON.stringify(draft.items) === JSON.stringify(items)){
+          qa = draft.qa || qa;
+          etats = draft.etats || etats;
+          i = Math.min(draft.i || 0, items.length - 1);
+        }
+      }
+    }catch(e){ /* brouillon corrompu : on repart de zéro sans bloquer */ }
+
     const textEl = document.getElementById('q-text');
     const answerEl = document.getElementById('q-answer');
+    const optionsEl = document.getElementById('q-options');
     const progressEl = document.getElementById('q-progress');
     const dotsEl = document.getElementById('q-dots');
     const nextEl = document.getElementById('q-next');
     const prevEl = document.getElementById('q-prev');
 
-    function render(){
-      textEl.textContent = items[i];
+    function sauverBrouillon(){
+      localStorage.setItem(draftKey, JSON.stringify({ items: items, qa: qa, etats: etats, i: i }));
+    }
+    function estStructuree(item){ return typeof item === 'object' && item !== null; }
+
+    function majBoutonSuivant(){ nextEl.disabled = !estValide(); }
+
+    function estValide(){
+      const item = items[i];
+      if(!estStructuree(item)) return !!(qa[i] && qa[i].a && qa[i].a.trim());
+      if(!item.required) return true;
+      const etat = etats[i] || {};
+      if(item.type === 'single_choice' || item.type === 'multi_choice'){
+        const total = (etat.selection ? etat.selection.length : 0) + (etat.autreActive ? 1 : 0);
+        if(total < item.min) return false;
+        if(etat.autreActive && !etat.autreTexte) return false;
+        const precisionsManquantes = (item.options || []).some(o =>
+          o.needsPrecision && etat.selection && etat.selection.includes(o.label) && !etat['precision_' + o.label]
+        );
+        if(precisionsManquantes) return false;
+        return true;
+      }
+      if(item.type === 'scale'){
+        if(etat.echelle === null || etat.echelle === undefined) return false;
+        if(item.remark && item.remark.required && !etat.remarque) return false;
+        return true;
+      }
+      if(item.type === 'yes_no'){
+        if(etat.ouiNon === null || etat.ouiNon === undefined) return false;
+        if(etat.ouiNon === true && item.ifYes && item.ifYes.required && !etat.precisionOuiNon) return false;
+        return true;
+      }
+      return true;
+    }
+
+    // ---- Texte libre (comportement historique) ----
+    function renderTexte(item){
+      optionsEl.style.display = 'none';
+      answerEl.style.display = 'block';
+      textEl.textContent = item;
       answerEl.value = (qa[i] && qa[i].a) || '';
+      answerEl.oninput = function(){
+        qa[i] = { q: item, a: answerEl.value };
+        sauverBrouillon();
+        majBoutonSuivant();
+      };
+    }
+
+    // ---- Question structurée (choix unique/multiple, échelle, oui/non) ----
+    function renderStructuree(item){
+      answerEl.style.display = 'none';
+      optionsEl.style.display = 'block';
+      textEl.textContent = item.text;
+      optionsEl.innerHTML = '';
+
+      if(!etats[i]) etats[i] = { selection: [], autreActive: false, autreTexte: '', echelle: null, remarque: '', ouiNon: null, precisionOuiNon: '' };
+      const etat = etats[i];
+
+      function recalculerReponse(){
+        let a = '';
+        if(item.type === 'single_choice' || item.type === 'multi_choice'){
+          let a2 = (etat.selection || []).join(', ');
+          if(etat.autreActive && etat.autreTexte) a2 = (a2 ? a2 + ', ' : '') + 'Autre : ' + etat.autreTexte;
+          (item.options || []).forEach(function(o){
+            if(o.needsPrecision && etat.selection && etat.selection.includes(o.label) && etat['precision_' + o.label]){
+              a2 += ' (' + o.label + ' : ' + etat['precision_' + o.label] + ')';
+            }
+          });
+          a = a2;
+        } else if(item.type === 'scale'){
+          if(etat.echelle !== null && etat.echelle !== undefined){
+            const lbl = item.scaleLabels[String(etat.echelle)];
+            a = lbl ? (etat.echelle + ' — ' + lbl) : String(etat.echelle);
+          }
+          if(etat.remarque) a += (a ? ' — ' : '') + 'Remarque : ' + etat.remarque;
+        } else if(item.type === 'yes_no'){
+          a = etat.ouiNon === true ? 'Oui' : (etat.ouiNon === false ? 'Non' : '');
+          if(etat.ouiNon === true && etat.precisionOuiNon) a += ' — ' + etat.precisionOuiNon;
+        }
+        qa[i] = { q: item.text, a: a };
+        sauverBrouillon();
+        majBoutonSuivant();
+      }
+
+      function champTexte(valeur, placeholder, onInput){
+        const champ = document.createElement('input');
+        champ.type = 'text';
+        champ.placeholder = placeholder;
+        champ.value = valeur || '';
+        champ.style.cssText = 'display:block; width:100%; margin:4px 0 10px 26px; padding:7px 8px; border:1px solid #ccc; border-radius:6px; font-size:13px; max-width:calc(100% - 26px);';
+        champ.addEventListener('input', function(){ onInput(champ.value); });
+        return champ;
+      }
+
+      if(item.type === 'single_choice' || item.type === 'multi_choice'){
+        const isMulti = item.type === 'multi_choice';
+        const exclusifs = (item.options || []).filter(o => o.exclusive).map(o => o.label);
+
+        (item.options || []).forEach(function(opt){
+          const ligne = document.createElement('label');
+          ligne.style.cssText = 'display:flex; align-items:center; gap:8px; padding:7px 0; font-size:14px; cursor:pointer;';
+          const input = document.createElement('input');
+          input.type = isMulti ? 'checkbox' : 'radio';
+          input.name = 'q-choice-' + i;
+          input.checked = (etat.selection || []).includes(opt.label);
+          input.addEventListener('change', function(){
+            if(isMulti){
+              etat.selection = etat.selection || [];
+              if(input.checked){
+                if(opt.exclusive){ etat.selection = [opt.label]; etat.autreActive = false; }
+                else{ etat.selection = etat.selection.filter(l => !exclusifs.includes(l)); etat.selection.push(opt.label); }
+              } else {
+                etat.selection = etat.selection.filter(l => l !== opt.label);
+              }
+            } else {
+              etat.selection = [opt.label];
+              etat.autreActive = false;
+            }
+            renderStructuree(item);
+          });
+          ligne.appendChild(input);
+          ligne.appendChild(document.createTextNode(opt.label));
+          optionsEl.appendChild(ligne);
+
+          if(opt.needsPrecision && (etat.selection || []).includes(opt.label)){
+            optionsEl.appendChild(champTexte(etat['precision_' + opt.label], opt.precisionLabel, function(v){
+              etat['precision_' + opt.label] = v;
+              recalculerReponse();
+            }));
+          }
+        });
+
+        if(item.other){
+          const ligne = document.createElement('label');
+          ligne.style.cssText = 'display:flex; align-items:center; gap:8px; padding:7px 0; font-size:14px; cursor:pointer;';
+          const input = document.createElement('input');
+          input.type = isMulti ? 'checkbox' : 'radio';
+          input.name = 'q-choice-' + i;
+          input.checked = !!etat.autreActive;
+          input.addEventListener('change', function(){
+            if(!isMulti) etat.selection = [];
+            else etat.selection = (etat.selection || []).filter(l => !exclusifs.includes(l));
+            etat.autreActive = input.checked;
+            if(!input.checked) etat.autreTexte = '';
+            renderStructuree(item);
+          });
+          ligne.appendChild(input);
+          ligne.appendChild(document.createTextNode(item.other.label));
+          optionsEl.appendChild(ligne);
+
+          if(etat.autreActive){
+            optionsEl.appendChild(champTexte(etat.autreTexte, item.other.label, function(v){
+              etat.autreTexte = v;
+              recalculerReponse();
+            }));
+          }
+        }
+
+        if(isMulti){
+          const indicateur = document.createElement('p');
+          indicateur.style.cssText = 'font-size:11px; color:var(--text-dim); margin-top:6px;';
+          indicateur.textContent = 'Choix possibles : ' + item.min + ' à ' + (item.max === Infinity ? 'tous' : item.max);
+          optionsEl.appendChild(indicateur);
+        }
+
+        recalculerReponse();
+
+      } else if(item.type === 'scale'){
+        const rangee = document.createElement('div');
+        rangee.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;';
+        for(let v = item.scaleMin; v <= item.scaleMax; v++){
+          const bouton = document.createElement('button');
+          bouton.type = 'button';
+          const actif = etat.echelle === v;
+          bouton.textContent = v + (item.scaleLabels[String(v)] ? ' · ' + item.scaleLabels[String(v)] : '');
+          bouton.style.cssText = 'padding:8px 10px; border-radius:8px; border:1px solid ' + (actif ? 'var(--rose-deep)' : '#ccc') +
+            '; background:' + (actif ? 'var(--rose-deep)' : '#fff') + '; color:' + (actif ? '#fff' : 'inherit') +
+            '; font-size:12.5px; cursor:pointer;';
+          bouton.addEventListener('click', function(){ etat.echelle = v; renderStructuree(item); });
+          rangee.appendChild(bouton);
+        }
+        optionsEl.appendChild(rangee);
+
+        if(item.remark){
+          optionsEl.appendChild(champTexte(etat.remarque, item.remark.label, function(v){
+            etat.remarque = v;
+            recalculerReponse();
+          }));
+        }
+        recalculerReponse();
+
+      } else if(item.type === 'yes_no'){
+        const rangee = document.createElement('div');
+        rangee.style.cssText = 'display:flex; gap:10px; margin:8px 0;';
+        [['Oui', true], ['Non', false]].forEach(function(paire){
+          const label = paire[0], val = paire[1];
+          const actif = etat.ouiNon === val;
+          const bouton = document.createElement('button');
+          bouton.type = 'button';
+          bouton.textContent = label;
+          bouton.style.cssText = 'flex:1; padding:10px; border-radius:8px; border:1px solid ' + (actif ? 'var(--rose-deep)' : '#ccc') +
+            '; background:' + (actif ? 'var(--rose-deep)' : '#fff') + '; color:' + (actif ? '#fff' : 'inherit') +
+            '; font-size:14px; cursor:pointer;';
+          bouton.addEventListener('click', function(){
+            etat.ouiNon = val;
+            if(!val) etat.precisionOuiNon = '';
+            renderStructuree(item);
+          });
+          rangee.appendChild(bouton);
+        });
+        optionsEl.appendChild(rangee);
+
+        if(item.ifYes && etat.ouiNon === true){
+          optionsEl.appendChild(champTexte(etat.precisionOuiNon, item.ifYes.label, function(v){
+            etat.precisionOuiNon = v;
+            recalculerReponse();
+          }));
+        }
+        recalculerReponse();
+      }
+    }
+
+    function render(){
+      const item = items[i];
+      if(estStructuree(item)) renderStructuree(item);
+      else renderTexte(item);
+
       const d = dict();
       progressEl.textContent = (d[labelKey] || '') + ' ' + (i+1) + ' / ' + items.length;
       dotsEl.innerHTML = items.map((_, idx) => '<div class="dot ' + (idx <= i ? 'done' : '') + '"></div>').join('');
       nextEl.textContent = (i === items.length - 1) ? (d.nav_finish || 'Terminer') : (d.nav_next || 'Suivant');
+      majBoutonSuivant();
     }
-    answerEl.addEventListener('input', function(){ qa[i] = { q: items[i], a: answerEl.value }; });
-    prevEl.addEventListener('click', function(){ if(i > 0){ i--; render(); } });
+
+    prevEl.addEventListener('click', function(){ if(i > 0){ i--; sauverBrouillon(); render(); } });
     nextEl.addEventListener('click', function(){
-      if(!qa[i]) qa[i] = { q: items[i], a: answerEl.value };
-      if(i < items.length - 1){ i++; render(); }
-      else{ logAnswers(screenId, qa); window.location.href = nextUrl; }
+      if(!estValide()) return;
+      if(i < items.length - 1){ i++; sauverBrouillon(); render(); }
+      else{
+        logAnswers(screenId, qa);
+        localStorage.removeItem(draftKey);
+        window.location.href = nextUrl;
+      }
     });
     render();
   }

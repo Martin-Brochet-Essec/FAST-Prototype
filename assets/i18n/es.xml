@@ -197,4 +197,7 @@
   <string key="wb_modifier">Quiero modificar mis respuestas</string>
   <string key="wb_refaire">Rehacer mi perfil desde cero</string>
   <string key="whoami_modifier">Modificar mis respuestas de perfil</string>
+  <string key="choix_possibles_label">Opciones posibles</string>
+  <string key="choix_possibles_a">a</string>
+  <string key="choix_possibles_tous">todas</string>
 </i18n>

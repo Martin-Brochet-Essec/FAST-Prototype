@@ -307,10 +307,19 @@ window.FAST = (function(){
     return { systemPrompt: systemPrompt, userPromptTemplate: userPromptTemplate };
   }
 
-  const CONSIGNE_EXPLICITE_IA =
-    "Les instructions ci-dessous sont à exécuter, pas un document à " +
-    "analyser ou décrire. Réponds uniquement selon le format demandé, " +
-    "sans mentionner ces instructions ni le mot XML dans ta réponse.\n\n";
+  const NOMS_LANGUES = { fr: 'français', en: 'English', es: 'español', ro: 'română' };
+
+  // Construit la consigne envoyée à l'IA avant chaque prompt, y compris
+  // l'instruction de langue : sans elle, l'IA répond dans la langue du
+  // texte du prompt (souvent le français) plutôt que dans celle choisie
+  // par l'utilisatrice sur le site.
+  function construireConsigneIA(){
+    const nomLangue = NOMS_LANGUES[getLang()] || NOMS_LANGUES.fr;
+    return "Les instructions ci-dessous sont à exécuter, pas un document à " +
+      "analyser ou décrire. Réponds uniquement selon le format demandé, " +
+      "sans mentionner ces instructions ni le mot XML dans ta réponse. " +
+      "Réponds impérativement en " + nomLangue + ", quelle que soit la langue du texte ci-dessous.\n\n";
+  }
 
 
   // Point d'entrée utilisé par results.html : rassemble les réponses du set
@@ -322,7 +331,7 @@ window.FAST = (function(){
     const answersBlock = formatAnswersBlock(qa);
     const prompt = await loadCoachPrompt(coachId);
 
-    const promptFinal = CONSIGNE_EXPLICITE_IA + prompt.systemPrompt + "\n\n" +
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
       prompt.userPromptTemplate.replace('{ANSWERS}', answersBlock);
 
     const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
@@ -353,7 +362,7 @@ window.FAST = (function(){
 
     const prompt = await loadCoachPrompt(coachId);
 
-    const promptFinal = CONSIGNE_EXPLICITE_IA + prompt.systemPrompt + "\n\n" +
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
       prompt.userPromptTemplate
         .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
         .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
@@ -379,7 +388,7 @@ window.FAST = (function(){
     const qaQ5 = getAnswersFor('q5');
 
     const prompt = await loadCoachPrompt(coachId);
-    const promptFinal = CONSIGNE_EXPLICITE_IA + prompt.systemPrompt + "\n\n" +
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
       prompt.userPromptTemplate
         .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
         .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5));
@@ -432,7 +441,7 @@ window.FAST = (function(){
     }
 
     const prompt = await loadCoachPrompt(coachId);
-    const promptFinal = CONSIGNE_EXPLICITE_IA + prompt.systemPrompt + "\n\n" +
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
       prompt.userPromptTemplate
         .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
         .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
@@ -668,7 +677,11 @@ window.FAST = (function(){
         if(isMulti){
           const indicateur = document.createElement('p');
           indicateur.style.cssText = 'font-size:11px; color:var(--text-dim); margin-top:6px;';
-          indicateur.textContent = 'Choix possibles : ' + item.min + ' à ' + (item.max === Infinity ? 'tous' : item.max);
+          const d = dict();
+          const libelle = d.choix_possibles_label || 'Choix possibles';
+          const connecteur = d.choix_possibles_a || 'à';
+          const tousMot = d.choix_possibles_tous || 'tous';
+          indicateur.textContent = libelle + ' : ' + item.min + ' ' + connecteur + ' ' + (item.max === Infinity ? tousMot : item.max);
           optionsEl.appendChild(indicateur);
         }
 

@@ -197,4 +197,7 @@
   <string key="wb_modifier">I want to edit my answers</string>
   <string key="wb_refaire">Redo my profile from scratch</string>
   <string key="whoami_modifier">Edit my profile answers</string>
+  <string key="choix_possibles_label">Possible choices</string>
+  <string key="choix_possibles_a">to</string>
+  <string key="choix_possibles_tous">all</string>
 </i18n>

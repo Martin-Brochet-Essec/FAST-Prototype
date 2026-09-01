@@ -197,4 +197,7 @@
   <string key="wb_modifier">Vreau să-mi modific răspunsurile</string>
   <string key="wb_refaire">Refă profilul de la început</string>
   <string key="whoami_modifier">Modifică-mi răspunsurile de profil</string>
+  <string key="choix_possibles_label">Alegeri posibile</string>
+  <string key="choix_possibles_a">la</string>
+  <string key="choix_possibles_tous">toate</string>
 </i18n>

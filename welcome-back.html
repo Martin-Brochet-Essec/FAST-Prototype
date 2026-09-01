@@ -29,6 +29,9 @@
       <button class="btn btn-primary" id="wb-continuer" data-i18n="wb_continuer">Poser ma question</button>
     </div>
     <div class="steprow">
+      <button class="btn btn-ghost" id="wb-modifier" data-i18n="wb_modifier">Je veux modifier mes réponses</button>
+    </div>
+    <div class="steprow">
       <button class="btn btn-ghost" id="wb-refaire" data-i18n="wb_refaire">Refaire mon profil depuis le début</button>
     </div>
   </section>
@@ -39,6 +42,12 @@
 document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('wb-continuer').addEventListener('click', function(){
     window.location.href = 'your-question.html';
+  });
+  document.getElementById('wb-modifier').addEventListener('click', function(){
+    // ?edit=1 indique à q10.html de ne PAS renvoyer ici : l'utilisatrice
+    // veut revoir/modifier ses réponses existantes (conservées grâce au
+    // brouillon), pas repartir de zéro.
+    window.location.href = 'q10.html?edit=1';
   });
   document.getElementById('wb-refaire').addEventListener('click', function(){
     FAST.clearProfileData();

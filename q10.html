@@ -40,7 +40,8 @@
 <script src="assets/app.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  if(FAST.hasCompletedProfile()){
+  const modeEdition = new URLSearchParams(window.location.search).get('edit') === '1';
+  if(FAST.hasCompletedProfile() && !modeEdition){
     window.location.href = 'welcome-back.html';
     return;
   }

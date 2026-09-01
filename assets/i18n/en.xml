@@ -196,4 +196,5 @@
   <string key="wb_continuer">Ask my question</string>
   <string key="wb_modifier">I want to edit my answers</string>
   <string key="wb_refaire">Redo my profile from scratch</string>
+  <string key="whoami_modifier">Edit my answers (Q10 + Q5)</string>
 </i18n>

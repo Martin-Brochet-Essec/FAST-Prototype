@@ -196,4 +196,5 @@
   <string key="wb_continuer">Poser ma question</string>
   <string key="wb_modifier">Je veux modifier mes réponses</string>
   <string key="wb_refaire">Refaire mon profil depuis le début</string>
+  <string key="whoami_modifier">Modifier mes réponses (Q10 + Q5)</string>
 </i18n>

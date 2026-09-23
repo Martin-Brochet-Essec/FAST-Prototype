@@ -17,16 +17,7 @@
     <button class="langbtn" data-lang="es" onclick="FAST.setLang('es')">ES</button>
     <button class="langbtn" data-lang="ro" onclick="FAST.setLang('ro')">RO</button>
   </div>
-  <div class="statusbar"><span>9:41</span><span class="brandmark">FAST</span></div>
-  <div class="menu-overlay" id="menuOverlay" onclick="if(event.target===this) FAST.closeMenu()">
-    <div class="menu-panel">
-      <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
-      <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
-      <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
-      <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
-      <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
-    </div>
-  </div>
+  <fast-header></fast-header>
   <section class="screen">
 <div class="home-header">
   <div>
@@ -49,10 +40,10 @@
     <h3 data-i18n="home_tile_question_title">Poser une question</h3>
     <p data-i18n="home_tile_question_desc">Une situation à débloquer, là, maintenant.</p>
   </a>
-  <a class="tile" href="new-question.html">
+  <a class="tile" href="skills.html">
     <div class="tile-icon e">&rarr;</div>
-    <h3 data-i18n="home_tile_coaching_title">Se connecter</h3>
-    <p data-i18n="home_tile_coaching_desc">Accéder à mon compte et mon coaching.</p>
+    <h3 data-i18n="home_tile_coaching_title">Travailler sur mes compétences</h3>
+    <p data-i18n="home_tile_coaching_desc">Renforcez les compétences qui feront la différence.</p>
   </a>
   <a class="tile" href="marketplace.html">
     <div class="tile-icon f">&#9670;</div>

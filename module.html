@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAST — Mon parcours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Petrona:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="device">
+  <div class="langswitch">
+    <button class="langbtn" data-lang="fr" onclick="FAST.setLang('fr')">FR</button>
+    <button class="langbtn" data-lang="en" onclick="FAST.setLang('en')">EN</button>
+    <button class="langbtn" data-lang="es" onclick="FAST.setLang('es')">ES</button>
+    <button class="langbtn" data-lang="ro" onclick="FAST.setLang('ro')">RO</button>
+  </div>
+
+  <fast-header></fast-header>
+
+  <section class="screen">
+    <div>
+      <a class="back" href="index.html" data-i18n="back_generic">Retour</a>
+      <div class="eyebrow" id="module-eyebrow">…</div>
+      <h1 style="font-size:20px; margin:4px 0 12px;" id="module-titre">…</h1>
+
+      <div class="card" id="module-chargement">
+        <p style="font-size:13.5px; color:var(--text-dim); line-height:1.6; margin:0;" data-i18n="module_chargement">
+          Chargement de votre parcours...
+        </p>
+      </div>
+
+      <div class="card" id="module-erreur" style="display:none;">
+        <p style="font-size:13.5px; color:#c0392b; line-height:1.6; margin:0;" id="module-erreur-texte"></p>
+      </div>
+
+      <!-- Étape : retour sur l'exercice de la veille (jour 2 à 5) -->
+      <div id="module-etape-retour-veille" style="display:none;">
+        <div class="card">
+          <p id="rv-jour" style="font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px;"></p>
+          <p id="rv-exercice-choisi" style="font-size:13.5px; line-height:1.6; margin:0; font-style:italic;"></p>
+        </div>
+        <p class="lead" data-i18n="module_retour_label">Comment ça s'est passé ?</p>
+        <textarea id="rv-texte" rows="5" data-i18n-ph="module_retour_ph" placeholder="Racontez votre expérience..."></textarea>
+        <div class="steprow">
+          <button class="btn btn-primary" id="rv-envoyer" data-i18n="module_retour_envoyer">Envoyer mon retour</button>
+        </div>
+      </div>
+
+      <!-- Étape : analyse IA de la veille -->
+      <div id="module-etape-analyse-veille" style="display:none;">
+        <div class="card">
+          <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 6px;" data-i18n="module_analyse_title">Ce que votre coach en pense</h3>
+          <div id="analyse-coach-badge" style="margin:0 0 8px;"></div>
+          <p id="analyse-texte" style="font-size:14px; color:var(--text); line-height:1.7; margin:0;"></p>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-primary" id="analyse-continuer" data-i18n="module_analyse_continuer">Continuer vers le quiz</button>
+        </div>
+      </div>
+
+      <!-- Étape : quiz -->
+      <div id="module-etape-quiz" style="display:none;">
+        <p id="quiz-progression" style="font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px;"></p>
+
+        <!-- "Serpent" de progression : 50 briques (5 groupes de 10, un
+             symbole par jour), enveloppant la carte de question. Grise =
+             pas encore répondue, verte/rouge = répondue (cliquable pour
+             relire), symbole selon le jour d'origine de la question. -->
+        <div id="quiz-serpent-haut" style="display:none; flex-wrap:wrap; justify-content:center; gap:3px; margin-bottom:6px;"></div>
+        <div style="display:flex; gap:6px; align-items:stretch;">
+          <div id="quiz-serpent-gauche" style="display:none; flex-direction:column; flex-wrap:wrap; max-height:190px; gap:3px; flex-shrink:0;"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="card" id="quiz-question-bloc">
+              <p id="quiz-texte" style="font-size:14px; margin:0 0 10px;"></p>
+              <div id="quiz-options"></div>
+            </div>
+          </div>
+          <div id="quiz-serpent-droite" style="display:none; flex-direction:column; flex-wrap:wrap; max-height:190px; gap:3px; flex-shrink:0;"></div>
+        </div>
+        <div id="quiz-serpent-bas" style="display:none; flex-wrap:wrap; gap:3px; margin-top:6px;"></div>
+
+        <!-- Relecture d'une question déjà répondue (clic sur une brique verte/rouge) -->
+        <div class="card" id="quiz-relecture" style="display:none; border:1px solid var(--rose-deep);">
+          <p id="relecture-jour" style="font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px;"></p>
+          <p id="relecture-texte" style="font-size:14px; margin:0 0 10px;"></p>
+          <div id="relecture-options"></div>
+          <p id="relecture-explication" style="font-size:13.5px; color:var(--text); line-height:1.6; margin:12px 0 0; padding-top:10px; border-top:1px solid #eee;"></p>
+          <div class="steprow" id="relecture-boutons-reponse" style="display:none;">
+            <button class="btn btn-primary" id="relecture-suivante" data-i18n="module_quiz_suivante">Question suivante</button>
+            <button class="btn btn-ghost" id="relecture-plus-tard" data-i18n="module_quiz_plus_tard">J'en ferai plus demain</button>
+          </div>
+          <div class="steprow" id="relecture-bouton-fermer">
+            <button class="btn btn-ghost" id="relecture-fermer" data-i18n="module_relecture_fermer">Fermer</button>
+          </div>
+        </div>
+
+        <div class="card" id="quiz-fin-banque" style="display:none;">
+          <p style="font-size:13.5px; color:var(--text-dim); margin:0;" data-i18n="module_quiz_banque_epuisee">Vous avez fait le tour de toutes les questions cette semaine.</p>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-primary" id="quiz-suivante" data-i18n="module_quiz_suivante" disabled>Question suivante</button>
+          <button class="btn btn-ghost" id="quiz-plus-tard" data-i18n="module_quiz_plus_tard">J'en ferai plus demain</button>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-ghost" id="quiz-reinitialiser" data-i18n="module_quiz_reinitialiser" style="color:#c0392b; font-size:12px;">Reprendre les questions à zéro</button>
+        </div>
+      </div>
+
+
+      <!-- Étape : proposition d'exercice du jour -->
+      <div id="module-etape-exercice" style="display:none;">
+        <div class="card">
+          <p id="ex-jour" style="font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px;"></p>
+          <h3 style="font-size:14.5px; margin:0 0 6px;" data-i18n="module_exercice_suggere_title">Idée pour aujourd'hui</h3>
+          <p id="ex-objectif-suggere" style="font-size:13.5px; line-height:1.6; margin:0;"></p>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-primary" id="ex-envoyer" data-i18n="module_exercice_envoyer">C'est parti</button>
+        </div>
+      </div>
+
+      <!-- Étape : retour sur le dernier exercice, le samedi, avant le bilan -->
+      <div id="module-etape-retour-samedi" style="display:none;">
+        <div class="card">
+          <p style="font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.02em; margin:0 0 8px;" data-i18n="module_retour_samedi_eyebrow">Avant votre bilan</p>
+          <p id="rs-exercice-choisi" style="font-size:13.5px; line-height:1.6; margin:0; font-style:italic;"></p>
+        </div>
+        <p class="lead" data-i18n="module_retour_label">Comment ça s'est passé ?</p>
+        <textarea id="rs-texte" rows="5" data-i18n-ph="module_retour_ph" placeholder="Racontez votre expérience..."></textarea>
+        <div class="steprow">
+          <button class="btn btn-primary" id="rs-envoyer" data-i18n="module_retour_samedi_envoyer">Envoyer et voir mon bilan</button>
+        </div>
+      </div>
+
+      <!-- Étape : bilan du samedi -->
+      <div id="module-etape-bilan" style="display:none;">
+        <div class="card" id="bilan-chargement">
+          <div id="bilan-chargement-badge" style="display:none; justify-content:center; margin:0 0 14px;"></div>
+          <p style="font-size:13.5px; color:var(--text-dim); line-height:1.6; margin:0;" data-i18n="module_bilan_chargement">
+            Préparation du bilan de votre semaine...
+          </p>
+        </div>
+        <div class="card" id="bilan-contenu" style="display:none;">
+          <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 6px;" data-i18n="module_bilan_title">Votre bilan</h3>
+          <div id="bilan-coach-badge" style="margin:0 0 8px;"></div>
+          <p id="bilan-texte" style="font-size:13.5px; color:var(--text); line-height:1.7; margin:0 0 10px; white-space:pre-line; display:-webkit-box; -webkit-line-clamp:10; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;"></p>
+          <button class="btn btn-ghost" id="bilan-telecharger" data-i18n="module_bilan_telecharger">Télécharger en .txt</button>
+        </div>
+        <p class="lead" data-i18n="module_bilan_choix_lead">Et maintenant ?</p>
+        <div class="steprow">
+          <button class="btn btn-primary" id="bilan-approfondir" data-i18n="module_bilan_approfondir">Reprendre les questions ratées</button>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-ghost" id="bilan-mise-en-relation" data-i18n="module_bilan_mise_en_relation">Être mise en relation</button>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-ghost" id="bilan-accueil" data-i18n="module_bilan_accueil">Retour à l'accueil</button>
+        </div>
+        <div class="steprow">
+          <button class="btn btn-ghost" id="bilan-recommencer" data-i18n="module_bilan_recommencer" style="color:#c0392b;">Recommencer toute la semaine</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="assets/fallback.js"></script>
+<script src="assets/ai-config.js"></script>
+<script src="assets/ai.js"></script>
+<script src="assets/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function(){
+  const moduleId = new URLSearchParams(window.location.search).get('module') || 'coaching-julie';
+
+  const chargement = document.getElementById('module-chargement');
+  const erreurBloc = document.getElementById('module-erreur');
+  const erreurTexte = document.getElementById('module-erreur-texte');
+
+  const etapes = {
+    retourVeille: document.getElementById('module-etape-retour-veille'),
+    analyseVeille: document.getElementById('module-etape-analyse-veille'),
+    quiz: document.getElementById('module-etape-quiz'),
+    exercice: document.getElementById('module-etape-exercice'),
+    retourSamedi: document.getElementById('module-etape-retour-samedi'),
+    bilan: document.getElementById('module-etape-bilan')
+  };
+  const zonesSerpent = {
+    haut: document.getElementById('quiz-serpent-haut'),
+    droite: document.getElementById('quiz-serpent-droite'),
+    bas: document.getElementById('quiz-serpent-bas'),
+    gauche: document.getElementById('quiz-serpent-gauche')
+  };
+  const zoneRelecture = document.getElementById('quiz-relecture');
+  const SYMBOLES_JOUR = ['+', '×', '▲', '●', '◆']; // Lundi, Mardi, Mercredi, Jeudi, Vendredi
+
+  let moduleDef, etat, questionCourante, ordreAffichageCourant;
+
+  function masquerToutesEtapes(){
+    Object.values(etapes).forEach(el => { el.style.display = 'none'; });
+    Object.values(zonesSerpent).forEach(z => { z.style.display = 'none'; });
+    zoneRelecture.style.display = 'none';
+  }
+
+  function afficherErreur(erreur){
+    masquerToutesEtapes();
+    chargement.style.display = 'none';
+    erreurBloc.style.display = 'block';
+    erreurTexte.textContent = 'Error: ' + erreur.message;
+  }
+
+  function creerBrique(question, etatCourant, index){
+    const reponse = etatCourant.reponsesQuizSemaine[question.id];
+    let couleur = '#d9d9d9'; // grise : pas encore répondue cette semaine
+    let cliquable = false;
+    if(reponse){
+      couleur = reponse.correcte ? '#27ae60' : '#c0392b';
+      cliquable = true;
+    }
+    const symbole = SYMBOLES_JOUR[Math.floor(index / 10)] || '';
+    const brique = document.createElement('div');
+    brique.textContent = symbole;
+    brique.style.cssText = 'width:16px; height:16px; border-radius:3px; background:' + couleur +
+      '; display:flex; align-items:center; justify-content:center; font-size:9px; line-height:1; color:#fff; flex-shrink:0; ' +
+      (cliquable ? 'cursor:pointer;' : 'cursor:default;');
+    if(cliquable){
+      brique.title = symbole;
+      brique.addEventListener('click', function(){ ouvrirRelecture(question, reponse); });
+    }
+    return brique;
+  }
+
+  // Barre "serpent" : 50 briques (5 groupes de 10, un symbole par jour)
+  // réparties tout autour de la carte de question (haut, droite, bas,
+  // gauche). Grise = jamais répondue cette semaine, verte/rouge = déjà
+  // répondue et cliquable pour relire.
+  function dessinerBarreQuiz(){
+    const etatCourant = FAST.getEtatModule(moduleId);
+    const total = moduleDef.questions.length;
+    Object.values(zonesSerpent).forEach(z => { z.innerHTML = ''; z.style.display = 'none'; });
+
+    // Lundi (0-9) + Mardi (10-19) -> gauche (20 briques)
+    // Mercredi (20-29) -> haut (10 briques)
+    // Jeudi (30-39) + Vendredi (40-49) -> droite (20 briques)
+    for(let idx = 0; idx < Math.min(20, total); idx++){
+      zonesSerpent.gauche.appendChild(creerBrique(moduleDef.questions[idx], etatCourant, idx));
+    }
+    for(let idx = 20; idx < Math.min(30, total); idx++){
+      zonesSerpent.haut.appendChild(creerBrique(moduleDef.questions[idx], etatCourant, idx));
+    }
+    for(let idx = 30; idx < Math.min(50, total); idx++){
+      zonesSerpent.droite.appendChild(creerBrique(moduleDef.questions[idx], etatCourant, idx));
+    }
+    if(zonesSerpent.gauche.children.length) zonesSerpent.gauche.style.display = 'flex';
+    if(zonesSerpent.haut.children.length) zonesSerpent.haut.style.display = 'flex';
+    if(zonesSerpent.droite.children.length) zonesSerpent.droite.style.display = 'flex';
+  }
+
+  // Affiche une question déjà répondue en lecture seule : sa réponse
+  // choisie, la bonne réponse, et l'explication.
+  // Rendu commun : question, options colorées (bonne/mauvaise), explication.
+  // Utilisé à la fois pour la relecture d'une question passée et pour la
+  // popup affichée juste après avoir répondu.
+  function remplirCarteExplication(question, indexChoisi){
+    document.getElementById('relecture-texte').textContent = question.text;
+
+    const optionsEl = document.getElementById('relecture-options');
+    optionsEl.innerHTML = '';
+    question.options.forEach(function(opt, idx){
+      const ligne = document.createElement('div');
+      let style = 'padding:10px 12px; margin-bottom:6px; border-radius:8px; border:1px solid #ccc; font-size:13px; box-sizing:border-box;';
+      if(idx === question.bonneReponse){ style += 'background:#27ae60; color:#fff; border-color:transparent;'; }
+      else if(idx === indexChoisi){ style += 'background:#c0392b; color:#fff; border-color:transparent;'; }
+      ligne.style.cssText = style;
+      ligne.textContent = opt;
+      optionsEl.appendChild(ligne);
+    });
+    document.getElementById('relecture-explication').textContent = question.explication || '';
+  }
+
+  // Relecture d'une question déjà répondue (clic sur une brique verte/rouge
+  // du serpent) : lecture seule, un seul bouton "Fermer".
+  function ouvrirRelecture(question, reponse){
+    document.getElementById('quiz-question-bloc').style.display = 'none';
+    document.getElementById('quiz-fin-banque').style.display = 'none';
+    zoneRelecture.style.display = 'block';
+
+    document.getElementById('relecture-jour').textContent = FAST.dict().module_relecture_label || 'Relecture';
+    remplirCarteExplication(question, reponse.indexChoisi);
+
+    document.getElementById('relecture-boutons-reponse').style.display = 'none';
+    document.getElementById('relecture-bouton-fermer').style.display = 'flex';
+  }
+
+  // Popup affichée juste après avoir répondu à la question du jour : même
+  // rendu, mais avec les boutons "Question suivante" / "J'en ferai plus
+  // demain" dupliqués, pour agir directement sans fermer la fenêtre.
+  function ouvrirPopupApresReponse(question, indexChoisi){
+    document.getElementById('quiz-question-bloc').style.display = 'none';
+    document.getElementById('quiz-fin-banque').style.display = 'none';
+    zoneRelecture.style.display = 'block';
+
+    const d = FAST.dict();
+    document.getElementById('relecture-jour').textContent = indexChoisi === question.bonneReponse
+      ? (d.module_quiz_bonne_reponse || 'Bonne réponse !')
+      : (d.module_quiz_mauvaise_reponse || 'Pas tout à fait...');
+    remplirCarteExplication(question, indexChoisi);
+
+    document.getElementById('relecture-bouton-fermer').style.display = 'none';
+    document.getElementById('relecture-boutons-reponse').style.display = 'flex';
+  }
+
+  function fermerRelecture(){
+    zoneRelecture.style.display = 'none';
+    document.getElementById('quiz-question-bloc').style.display = 'block';
+  }
+
+  async function afficherEtapeCourante(){
+    etat = FAST.getEtatModule(moduleId);
+    masquerToutesEtapes();
+
+    if(etat.phase === 'bilan'){
+      await afficherBilan();
+      return;
+    }
+
+    const d = FAST.dict();
+
+    if(etat.phase === 'retour_veille'){
+      etapes.retourVeille.style.display = 'block';
+      const derniereEntree = etat.historiqueExercices[etat.historiqueExercices.length - 1];
+      document.getElementById('rv-jour').textContent = (d.module_progression_jour || 'Jour') + ' ' + etat.jour;
+      document.getElementById('rv-exercice-choisi').textContent = derniereEntree ? derniereEntree.objectifSuggere : '';
+      document.getElementById('rv-texte').value = '';
+
+    } else if(etat.phase === 'analyse_veille'){
+      etapes.analyseVeille.style.display = 'block';
+      const derniereEntree = etat.historiqueExercices[etat.historiqueExercices.length - 1];
+      document.getElementById('analyse-texte').textContent = derniereEntree ? derniereEntree.analyse : '';
+      document.getElementById('analyse-coach-badge').innerHTML = badgeCoachHTML;
+
+    } else if(etat.phase === 'quiz'){
+      etapes.quiz.style.display = 'block';
+      dessinerBarreQuiz();
+      afficherQuestionQuiz();
+
+    } else if(etat.phase === 'exercice_propose'){
+      etapes.exercice.style.display = 'block';
+      const exerciceDef = moduleDef.exercices[etat.jour - 1];
+      document.getElementById('ex-jour').textContent = exerciceDef ? exerciceDef.jour : '';
+      document.getElementById('ex-objectif-suggere').textContent = exerciceDef ? exerciceDef.objectif : '';
+      document.getElementById('ex-texte').value = '';
+
+    } else if(etat.phase === 'retour_samedi'){
+      etapes.retourSamedi.style.display = 'block';
+      const derniereEntree = etat.historiqueExercices[etat.historiqueExercices.length - 1];
+      document.getElementById('rs-exercice-choisi').textContent = derniereEntree ? derniereEntree.objectifSuggere : '';
+      document.getElementById('rs-texte').value = '';
+    }
+  }
+
+  function afficherQuestionQuiz(){
+    const d = FAST.dict();
+    document.getElementById('quiz-progression').textContent =
+      (d.module_quiz_progression || 'Question du jour') + ' ' + (etat.quizAujourdhui.repondues + 1) +
+      ' (' + (d.module_quiz_objectif || 'objectif : 10/jour') + ')';
+
+    questionCourante = FAST.tirerQuestionQuiz(moduleDef, moduleId);
+    const blocQuestion = document.getElementById('quiz-question-bloc');
+    const blocFin = document.getElementById('quiz-fin-banque');
+    const boutonSuivante = document.getElementById('quiz-suivante');
+
+    boutonSuivante.disabled = true;
+
+    if(!questionCourante){
+      blocQuestion.style.display = 'none';
+      blocFin.style.display = 'block';
+      boutonSuivante.disabled = true;
+      return;
+    }
+    blocQuestion.style.display = 'block';
+    blocFin.style.display = 'none';
+
+    document.getElementById('quiz-texte').textContent = questionCourante.text;
+    const optionsEl = document.getElementById('quiz-options');
+    optionsEl.innerHTML = '';
+
+    // Ordre d'affichage mélangé à chaque fois (Fisher-Yates), pour que la
+    // bonne réponse ne soit pas toujours à la même position.
+    ordreAffichageCourant = questionCourante.options.map((_, i) => i);
+    for(let i = ordreAffichageCourant.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [ordreAffichageCourant[i], ordreAffichageCourant[j]] = [ordreAffichageCourant[j], ordreAffichageCourant[i]];
+    }
+
+    ordreAffichageCourant.forEach(function(indexCanonique){
+      const bouton = document.createElement('button');
+      bouton.type = 'button';
+      bouton.textContent = questionCourante.options[indexCanonique];
+      bouton.style.cssText = 'display:block; width:100%; box-sizing:border-box; text-align:left; padding:12px 10px; margin-bottom:6px; border-radius:8px; border:1px solid #ccc; background:#fff; font-size:13px; line-height:1.4; cursor:pointer;';
+      bouton.addEventListener('click', function(){
+        const correcte = FAST.soumettreReponseQuiz(moduleId, questionCourante, indexCanonique);
+        Array.from(optionsEl.children).forEach(b => { b.disabled = true; });
+        dessinerBarreQuiz();
+        boutonSuivante.disabled = false;
+        ouvrirPopupApresReponse(questionCourante, indexCanonique);
+      });
+      optionsEl.appendChild(bouton);
+    });
+  }
+
+  async function afficherBilan(){
+    etapes.bilan.style.display = 'block';
+    const chargementBilan = document.getElementById('bilan-chargement');
+    const contenuBilan = document.getElementById('bilan-contenu');
+    if(badgeCoachHTML){
+      const badgeChargementBilan = document.getElementById('bilan-chargement-badge');
+      badgeChargementBilan.innerHTML = badgeCoachHTML;
+      badgeChargementBilan.style.display = 'flex';
+    }
+    try{
+      const bilan = await FAST.produireBilanModule(moduleId);
+      chargementBilan.style.display = 'none';
+      contenuBilan.style.display = 'block';
+      document.getElementById('bilan-texte').textContent = bilan;
+      document.getElementById('bilan-coach-badge').innerHTML = badgeCoachHTML;
+    }catch(erreur){
+      chargementBilan.style.display = 'none';
+      contenuBilan.style.display = 'block';
+      document.getElementById('bilan-texte').textContent = 'Error: ' + erreur.message;
+    }
+  }
+
+  let badgeCoachHTML = '';
+
+  try{
+    moduleDef = await FAST.loadModule(moduleId);
+    document.getElementById('module-eyebrow').textContent = FAST.dict().module_eyebrow || 'Votre parcours';
+    document.getElementById('module-titre').textContent = moduleDef.name;
+
+    try{
+      const profils = await FAST.loadCoachProfiles();
+      const { ids } = FAST.getCoachActuel();
+      const idPrincipal = ids.find(id => profils[id]);
+      if(idPrincipal) badgeCoachHTML = FAST.genererBadgeCoachHTML(idPrincipal, profils[idPrincipal].name, 140);
+    }catch(e){ /* pas bloquant si le badge échoue à se calculer */ }
+
+    FAST.demarrerOuReprendreModule(moduleId);
+    chargement.style.display = 'none';
+    await afficherEtapeCourante();
+
+  }catch(erreur){
+    afficherErreur(erreur);
+  }
+
+  document.getElementById('rv-envoyer').addEventListener('click', async function(){
+    const texte = document.getElementById('rv-texte').value.trim();
+    if(!texte) return;
+    const bouton = document.getElementById('rv-envoyer');
+    bouton.disabled = true;
+
+    // Affiche tout de suite l'écran "Ce que votre coach en pense" avec un
+    // indicateur de chargement, plutôt que de laisser la page inerte
+    // pendant l'appel IA.
+    etapes.retourVeille.style.display = 'none';
+    etapes.analyseVeille.style.display = 'block';
+    document.getElementById('analyse-texte').textContent = FAST.dict().module_analyse_chargement || 'Je réfléchis...';
+    document.getElementById('analyse-coach-badge').innerHTML = badgeCoachHTML;
+
+    try{
+      await FAST.soumettreRetourVeille(moduleId, texte);
+      await afficherEtapeCourante();
+    }catch(erreur){ afficherErreur(erreur); }
+    bouton.disabled = false;
+  });
+
+  document.getElementById('analyse-continuer').addEventListener('click', async function(){
+    FAST.passerAuQuizDuJour(moduleId);
+    await afficherEtapeCourante();
+  });
+
+  document.getElementById('quiz-suivante').addEventListener('click', function(){
+    fermerRelecture();
+    afficherQuestionQuiz();
+  });
+
+  document.getElementById('quiz-plus-tard').addEventListener('click', async function(){
+    fermerRelecture();
+    FAST.arreterQuizPourAujourdhui(moduleId);
+    await afficherEtapeCourante();
+  });
+
+  document.getElementById('quiz-reinitialiser').addEventListener('click', function(){
+    const d = FAST.dict();
+    const confirmation = window.confirm(d.module_quiz_reinitialiser_confirm || 'Toutes vos réponses au quiz seront oubliées (vos exercices restent conservés). Continuer ?');
+    if(!confirmation) return;
+    FAST.reinitialiserQuestionsQuiz(moduleId);
+    afficherEtapeCourante();
+  });
+
+  document.getElementById('ex-envoyer').addEventListener('click', async function(){
+    FAST.validerExerciceDuJour(moduleId, moduleDef);
+    await afficherEtapeCourante();
+  });
+
+  document.getElementById('rs-envoyer').addEventListener('click', async function(){
+    const texte = document.getElementById('rs-texte').value.trim();
+    if(!texte) return;
+    FAST.soumettreRetourSamedi(moduleId, texte);
+    await afficherEtapeCourante();
+  });
+
+  document.getElementById('bilan-approfondir').addEventListener('click', function(){
+    const rattrapage = FAST.getQuestionsRateesSemaine(moduleDef, moduleId);
+    if(rattrapage.length === 0){
+      // Toujours rester sur la page du module — ne jamais rediriger
+      // ailleurs, même quand il n'y a plus rien à reprendre.
+      window.alert(FAST.dict().module_bilan_aucune_question_ratee || "Bravo, il n'y a plus aucune question ratée à reprendre !");
+      return;
+    }
+    // Réinitialise l'accès à ces questions pour le rattrapage : on les
+    // retire de "vues cette semaine" afin qu'elles puissent réapparaître
+    // dans le quiz. modeRattrapage=true : une fois arrêté, on repasse
+    // directement au bilan (nouvelle analyse), pas par l'exercice du
+    // vendredi.
+    const etatCourant = FAST.getEtatModule(moduleId);
+    const idsRattrapage = rattrapage.map(q => q.id);
+    etatCourant.questionsVuesSemaine = etatCourant.questionsVuesSemaine.filter(id => !idsRattrapage.includes(id));
+    idsRattrapage.forEach(id => { delete etatCourant.reponsesQuizSemaine[id]; });
+    etatCourant.phase = 'quiz';
+    etatCourant.modeRattrapage = true;
+    etatCourant.quizAujourdhui = { correctes: 0, incorrectes: 0, repondues: 0 };
+    localStorage.setItem('fast_module_' + moduleId, JSON.stringify(etatCourant));
+    afficherEtapeCourante();
+  });
+
+  document.getElementById('relecture-fermer').addEventListener('click', function(){
+    fermerRelecture();
+  });
+
+  document.getElementById('relecture-suivante').addEventListener('click', function(){
+    fermerRelecture();
+    afficherQuestionQuiz();
+  });
+
+  document.getElementById('relecture-plus-tard').addEventListener('click', async function(){
+    fermerRelecture();
+    FAST.arreterQuizPourAujourdhui(moduleId);
+    await afficherEtapeCourante();
+  });
+
+  document.getElementById('bilan-accueil').addEventListener('click', function(){
+    window.location.href = 'index.html';
+  });
+
+  document.getElementById('bilan-recommencer').addEventListener('click', function(){
+    const d = FAST.dict();
+    const confirmation = window.confirm(d.module_bilan_recommencer_confirm || 'Toutes vos réponses de la semaine seront oubliées. Continuer ?');
+    if(!confirmation) return;
+    FAST.reinitialiserModule(moduleId);
+    window.location.href = 'module.html?module=' + encodeURIComponent(moduleId);
+  });
+
+  document.getElementById('bilan-mise-en-relation').addEventListener('click', function(){
+    window.location.href = 'marketplace.html';
+  });
+
+  document.getElementById('bilan-telecharger').addEventListener('click', function(){
+    const texte = document.getElementById('bilan-texte').textContent;
+    const blob = new Blob([texte], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const lien = document.createElement('a');
+    lien.href = url;
+    lien.download = 'bilan-' + moduleId + '.txt';
+    document.body.appendChild(lien);
+    lien.click();
+    document.body.removeChild(lien);
+    URL.revokeObjectURL(url);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modules>
+
+  <module id="coaching-julie">
+    <name>Coaching Julie — de lunes a sábado</name>
+    <description>Un recorrido de una semana, un pequeño reto cada día y un quiz para afianzar los conceptos, para avanzar de verdad en tu tema.</description>
+
+    <exercices>
+      <exercice numero="1" jour="Lunes">
+        <objectif>Detecta una situación en la que tu voz no se escuchó lo suficiente, y prepara una frase sencilla para hacerte oír la próxima vez.</objectif>
+      </exercice>
+      <exercice numero="2" jour="Martes">
+        <objectif>Pon esa frase en práctica en una reunión o conversación, y observa la reacción que obtienes.</objectif>
+      </exercice>
+      <exercice numero="3" jour="Miércoles">
+        <objectif>Identifica una tarea que podrías delegar hoy, y delégala de verdad.</objectif>
+      </exercice>
+      <exercice numero="4" jour="Jueves">
+        <objectif>Pide a un compañero o a alguien cercano un feedback constructivo sobre tu postura esta semana.</objectif>
+      </exercice>
+      <exercice numero="5" jour="Viernes">
+        <objectif>Anota un logro de la semana, por pequeño que sea, y compártelo con alguien.</objectif>
+      </exercice>
+    </exercices>
+
+    <!-- Questions à choix multiple : pas encore traduites dans cette langue.
+         app.js retombe automatiquement sur modules-fr.xml pour cette section. -->
+
+    <bilan>
+      <description>Balance del sábado: síntesis de la semana (ejercicios + quiz), y luego la elección entre profundizar con tu e-Coach (repetir las preguntas falladas) o ser puesta en contacto.</description>
+    </bilan>
+  </module>
+
+  <module id="autopromotion-valorisation-test">
+    <name>Autopromoción y Valorización Personal Test</name>
+    <description>Dar a conocer sus resultados y reivindicar abiertamente el impacto de su trabajo.</description>
+
+    <exercices>
+      <exercice numero="1" jour="Lunes">
+        <objectif>El inventario de los logros invisibles : Identificar y cuantificar sus contribuciones reales no documentadas. Dedique 15 minutos a repasar sus últimos 6 meses de actividad. Identifique 5 logros o problemas resueltos que no figuraran en su descripción inicial del puesto. Para cada punto, asocie una métrica de impacto (p. ej.: tiempo ahorrado, presupuesto ahorrado, agilización del proceso, satisfacción del cliente/equipo). Incluya estos 5 puntos en su informe de síntesis anual o en su diario de impacto.</objectif>
+      </exercice>
+      <exercice numero="2" jour="Martes">
+        <objectif>La presentación «Matriz de impacto» : Transformar una tarea operativa en un relato de valor ejecutivo. Seleccione una tarea operativa que realice con regularidad. Reformúlela siguiendo esta estructura: [Acción de optimización] + [Transformación del proceso] = [Resultado estratégico/financiero]. Redacte un discurso de 30 segundos y practique recitarlo en voz alta hasta que resulte fluido y natural.</objectif>
+      </exercice>
+      <exercice numero="3" jour="Miércoles">
+        <objectif>El afianzamiento y la amplificación en las reuniones : Asegurar la autoría de sus ideas y ocupar el terreno verbal. Antes de su próxima reunión clave, identifique una idea o recomendación importante que desee plantear. Defina una frase de afianzamiento directa (p. ej.: «Basándome en los datos de mi área, esta es la decisión que recomiendo...»). Acuerde previamente con un compañero de confianza: practiquen cómo dar continuidad a sus respectivas intervenciones utilizando fórmulas de ampliación (p. ej.: «Reafirmo el punto clave planteado por [Nombre]...»).</objectif>
+      </exercice>
+      <exercice numero="4" jour="Jueves">
+        <objectif>Simulación de la «hoja informativa» salarial : Preparar una negociación financiera basada en datos tangibles. Elabore un documento de una página («hoja informativa») que resuma sus tres principales contribuciones del año con sus indicadores financieros u operativos. Determine su cifra objetivo basándose en los valores de referencia del mercado. Realice un juego de roles de 10 minutos con un compañero o un coach para practicar cómo anunciar esa cifra sin vacilar y, a continuación, cómo gestionar el silencio que se produzca a continuación.</objectif>
+      </exercice>
+      <exercice numero="5" jour="Viernes">
+        <objectif>El mapa de patrocinadores : Estructurar su red de influencia y encontrar aliados estratégicos. Enumere tres directivos o responsables de la toma de decisiones ajenos a su línea jerárquica directa que tengan peso dentro de la organización. Para cada uno de ellos, identifique un tema de especialización sobre el que pueda solicitar su opinión o compartir un resultado estratégico reciente. Planifique un contacto o una interacción informal con al menos uno de ellos en los próximos 14 días.</objectif>
+      </exercice>
+    </exercices>
+
+    <questions_choix_multiple>
+      <question id="1">
+        <text>En la entrevista anual, su superior reconoce su implicación. ¿Qué formulación valora mejor su trabajo?</text>
+        <options>
+          <option>Gracias, es muy amable, pero ha sido sobre todo el trabajo de todo el equipo lo que ha dado sus frutos.</option>
+          <option>He reestructurado la estrategia comercial, lo que ha permitido aumentar las ventas en un 15 %.</option>
+          <option>Sí, he tenido suerte de contar con buenos proyectos este año. </option>
+          <option>Solo he seguido la hoja de ruta que se me indicó.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La respuesta B vincula directamente la acción personal con un resultado cuantificable (15 %). La modestia excesiva (respuesta A) o la atribución al azar (respuesta C) restan mérito a la labor personal y minimizan el valor percibido del trabajo.</explication>
+      </question>
+      <question id="2">
+        <text>Un compañero se atribuye la idea clave que usted planteó en la reunión de la semana pasada. ¿Qué hace usted?</text>
+        <options>
+          <option>No dice nada en ese momento para evitar el conflicto y se queja más tarde en privado.</option>
+          <option>Interviene de inmediato: Me alegra ver que retoma el análisis que presenté el martes.</option>
+          <option>Le interrumpe bruscamente diciéndole que es un ladrón de ideas.</option>
+          <option>Espera a la entrevista anual para ajustar cuentas.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La respuesta B reasigna públicamente la autoría de la idea con diplomacia y firmeza, sin agresividad. Dejar pasar el asunto equivale a validar la apropiación por parte de otros, mientras que la agresividad menoscaba la presencia ejecutiva.</explication>
+      </question>
+      <question id="3">
+        <text>Un director elogia la calidad de su presentación. ¿Cuál es la actitud más adecuada?</text>
+        <options>
+          <option>No ha sido nada, es un tema muy sencillo.</option>
+          <option>Perdón por los pequeños errores tipográficos en las diapositivas.</option>
+          <option>Gracias. He dedicado mucho esfuerzo a estructurar estos análisis y a aclarar la hoja de ruta.</option>
+          <option>Ha sido mi compañero quien ha realizado la mayor parte del trabajo.</option>
+        </options>
+        <bonne_reponse>2</bonne_reponse>
+        <explication>Aceptar un cumplido reconociendo el esfuerzo y el valor aportado refuerza la credibilidad. Tratar de disculparse o restar importancia al trabajo transmite la idea de que las competencias empleadas no merecen reconocimiento.</explication>
+      </question>
+      <question id="4">
+        <text>Ha resuelto un problema técnico grave con carácter de urgencia. ¿Cómo lo incluye en su balance?</text>
+        <options>
+          <option>Simplemente me ocupé de las emergencias habituales del departamento.</option>
+          <option>Gestión de crisis que garantizó la continuidad del servicio, lo que supuso 100 000 € de facturación.</option>
+          <option>Tuve que trabajar hasta tarde por la noche para corregir errores de otras personas.</option>
+          <option>Resolví un fallo que nunca debería haber ocurrido.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Una situación de emergencia debe traducirse en un valor financiero u operativo preservado. Esto transforma una tarea reactiva en una demostración de impacto empresarial.</explication>
+      </question>
+      <question id="5">
+        <text>¿Qué herramienta personal debería llevar de forma regular para preparar su valoración?</text>
+        <options>
+          <option>Una lista de quejas sobre los fallos de funcionamiento de la empresa.</option>
+          <option>Un diario semanal de impacto en el que se recojan los éxitos, las cifras clave y los comentarios positivos recibidos.</option>
+          <option>Un registro exacto de sus horas de presencia en la oficina.</option>
+          <option>Una recopilación de los errores cometidos por sus compañeros.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La memoria es selectiva y el sesgo de inmediatez hace que se olviden los logros de principios de año. Anotar los hechos y las métricas sobre la marcha garantiza un expediente objetivo e irrefutable durante las evaluaciones.</explication>
+      </question>
+      <question id="6">
+        <text>¿Por qué resulta perjudicial la expresión «He tenido suerte de que este proyecto saliera bien»?</text>
+        <options>
+          <option>Demuestra que es usted una persona humilde y apreciada.</option>
+          <option>Porque le resta mérito a la autora y atribuye el éxito al azar.</option>
+          <option>Incita al responsable a recortar el presupuesto del próximo proyecto.</option>
+          <option>No es perjudicial, es una fórmula de cortesía habitual.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Atribuir los éxitos a la suerte resta valor a las competencias. Si el éxito se debe al azar, la empresa no tiene ningún interés estratégico en ascender o promover a esa persona.</explication>
+      </question>
+      <question id="7">
+        <text>¿Cómo presentar un fracaso o un error en su balance sin menoscabar su valor?</text>
+        <options>
+          <option>Ocultar por completo el incidente y esperar que nadie se dé cuenta.</option>
+          <option>Culpar al equipo o a los proveedores externos.</option>
+          <option>Explicar el problema surgido, las medidas correctivas aplicadas y las lecciones clave aprendidas.</option>
+          <option>Pedir disculpas repetidamente y reconocer su falta de competencias.</option>
+        </options>
+        <bonne_reponse>2</bonne_reponse>
+        <explication>La capacidad de analizar un fracaso, extraer lecciones de él y poner en marcha medidas correctivas demuestra un alto nivel de madurez y liderazgo.</explication>
+      </question>
+      <question id="8">
+        <text>¿Qué significa el efecto de «modesta subestimación» que se observa a menudo en las mujeres en el ámbito empresarial?</text>
+        <options>
+          <option>Una técnica de negociación basada en el descuento.</option>
+          <option>La tendencia a minimizar los propios logros por miedo a parecer arrogante o pretenciosa.</option>
+          <option>El hecho de aceptar una reducción salarial en tiempos de crisis.</option>
+          <option>Un método de gestión contable de los activos.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La socialización suele llevar a temer que la asertividad se perciba como arrogancia. Este temor empuja a subestimar sistemáticamente los resultados.</explication>
+      </question>
+      <question id="9">
+        <text>¿Cuál es el mejor momento para dar a conocer el éxito de un proyecto de gran envergadura?</text>
+        <options>
+          <option>Únicamente al cabo de 12 meses, durante la entrevista anual.</option>
+          <option>Tan pronto como se alcance un hito importante, compartiendo una nota de síntesis del impacto o un balance provisional.</option>
+          <option>Nunca; la jerarquía se dará cuenta por sí misma.</option>
+          <option>Durante las pausas para el café, de manera informal y confidencial.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La visibilidad se construye en el presente. Esperar a la entrevista anual es demasiado tarde y priva a la persona del reconocimiento inmediato por los hitos alcanzados.</explication>
+      </question>
+      <question id="10">
+        <text>EJERCICIO PRÁCTICO DEL LUNES: Está creando su «Ficha de impacto». ¿Qué elemento NO DEBE figurar en ella?</text>
+        <options>
+          <option>Los beneficios económicos o de eficiencia generados.</option>
+          <option>La lista exhaustiva de todas sus tareas ejecutivas cotidianas y repetitivas.</option>
+          <option>Los testimonios de satisfacción de clientes o socios clave.</option>
+          <option>Los proyectos transversales dirigidos.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Una ficha de impacto es un documento estratégico de gran valor, no una descripción del puesto. Ocultar los logros tras las tareas de ejecución enmascara el impacto real y dificulta la legibilidad para los directivos. ----------------------------------------------------------------------------- --- MARTES: TRADUCIR SU TRABAJO EN MÉTRICAS E IMPACTO EMPRESARIAL --------------------------------------------------------------------------------</explication>
+      </question>
+      <question id="11">
+        <text>Ha optimizado un proceso interno. ¿Cómo presenta este logro?</text>
+        <options>
+          <option> He cambiado la forma en que se clasifican los expedientes en el departamento.</option>
+          <option>He ahorrado 4 horas a la semana en la tramitación de expedientes, que he reasignado al seguimiento de clientes.</option>
+          <option>Por fin he solucionado el desorden que dejó mi predecesor.</option>
+          <option>El trabajo llevaba demasiado tiempo, así que encontré un atajo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El valor no reside en la medida superficial, sino en el recurso liberado (4 horas a la semana) y su reinversión estratégica (atención al cliente).</explication>
+      </question>
+      <question id="12">
+        <text>¿Cómo convertir un proyecto «cualitativo» (p. ej., bienestar en el trabajo) en datos que reflejen su impacto empresarial?</text>
+        <options>
+          <option>Afirmando simplemente que los equipos están más satisfechos.</option>
+          <option>Midiendo la disminución de la tasa de rotación (-8 %) y el aumento de la puntuación de compromiso.</option>
+          <option>Mostrando fotografías de los eventos organizados.</option>
+          <option>Afirmando que se trata de un proyecto imposible de medir con cifras.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Cualquier proyecto cualitativo puede evaluarse mediante indicadores indirectos (proxy), como la tasa de retención, la contratación o el absentismo, que resultan inmediatamente comprensibles para un comité de dirección.</explication>
+      </question>
+      <question id="13">
+        <text>En una reunión de definición del presupuesto, ¿qué métrica debe destacar?</text>
+        <options>
+          <option>El número de horas extras no remuneradas que ha realizado.</option>
+          <option>La tasa de retorno de la inversión (ROI) y el margen neto generado por sus proyectos.</option>
+          <option>El coste de sus desplazamientos profesionales.</option>
+          <option>La dificultad del trabajo realizado.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El lenguaje del comité de dirección es el de la rentabilidad y el capital. Valorar su trabajo en función del esfuerzo o del tiempo dedicado (horas extras) resulta ineficaz en comparación con la generación de margen bruto.</explication>
+      </question>
+      <question id="14">
+        <text>¿Qué debe hacer si no dispone de cifras precisas sobre el impacto de su trabajo?</text>
+        <options>
+          <option>Inventar cifras espectaculares para causar buena impresión.</option>
+          <option>No mencionar ningún resultado y hablar únicamente de su motivación.</option>
+          <option>Elaborar una estimación realista basada en hipótesis documentadas y órdenes de magnitud.</option>
+          <option>Afirmar que la medición de los resultados no es responsabilidad suya.</option>
+        </options>
+        <bonne_reponse>2</bonne_reponse>
+        <explication>En el ámbito ejecutivo, una estimación documentada y basada en hipótesis claras es preferible a la ausencia total de métricas, lo que da a entender una falta de orientación hacia los resultados.</explication>
+      </question>
+      <question id="15">
+        <text>¿Cuál es la mejor forma de titular un proyecto exitoso en su currículum interno?</text>
+        <options>
+          <option>Participación en las reuniones de CRM.</option>
+          <option>Dirección de la migración de CRM: 0 interrupciones del servicio y un aumento del 12 % en la productividad comercial.</option>
+          <option>Asistencia prestada al equipo de informática.</option>
+          <option>Gestión del cambio informático.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El título debe combinar la responsabilidad asumida («Dirección»), el control del riesgo («0 interrupciones») y el impacto directo en la empresa (+12 % de productividad).</explication>
+      </question>
+      <question id="16">
+        <text>¿Por qué resulta arriesgado definirse únicamente como una persona «fiable y organizada»?</text>
+        <options>
+          <option>Porque demuestra que carece de empatía.</option>
+          <option>Porque le encasilla en roles de ejecutora insustituible, pero sin posibilidades de ascenso.</option>
+          <option>Porque se consideran defectos en el ámbito empresarial.</option>
+          <option>Porque a los directivos no les gusta la organización.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La fiabilidad se percibe como una competencia básica de ejecución. Si se convierte en una persona indispensable para la organización diaria, a su dirección le interesará mantenerle en su puesto en lugar de ascenderle a la alta dirección.</explication>
+      </question>
+      <question id="17">
+        <text>¿Cómo presentar una mejora de la eficiencia obtenida gracias a la automatización de una tarea?</text>
+        <options>
+          <option>Ya no hago nada manualmente en este ámbito.</option>
+          <option>Automatización de los informes: eliminación de 10 horas de envíos manuales y reasignación a la análisis estratégico.</option>
+          <option>He encontrado un programa muy útil que hace el trabajo por mí.</option>
+          <option>El trabajo manual resultaba demasiado tedioso.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El valor no proviene de la eliminación del trabajo, sino de la reasignación del tiempo dedicado a la ejecución hacia actividades de alto valor añadido (análisis estratégico).</explication>
+      </question>
+      <question id="18">
+        <text>¿Qué indicador debe utilizar para valorar una acción de fidelización de la cartera de clientes?</text>
+        <options>
+          <option>El número de correos electrónicos de empatía enviados.</option>
+          <option>La tasa de retención de clientes (95 %) y el valor de vida del cliente (LTV) conservado.</option>
+          <option>La amabilidad de los clientes durante las llamadas telefónicas.</option>
+          <option>El tiempo dedicado a reuniones de cortesía.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Las métricas de retención y de valor de vida útil (LTV) reflejan relaciones de calidad que protegen los ingresos recurrentes.</explication>
+      </question>
+      <question id="19">
+        <text>Ha formado a tres colaboradores. ¿Cómo valora esta contribución del departamento de RR. HH.?</text>
+        <options>
+          <option>He perdido tres días volviendo a explicar los conceptos básicos a los nuevos.</option>
+          <option>Mejora de las competencias de tres empleados junior: autonomía alcanzada en un mes y reducción del tiempo de incorporación en un 50 %.</option>
+          <option>He sido muy amable con el nuevo equipo.</option>
+          <option>He hecho el trabajo de RR. HH. en su lugar.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La formación de personas se convierte en un éxito de ingeniería de RR. HH. cuando se reduce el tiempo necesario para alcanzar la autonomía (time-to-autonomy), lo que permite un aumento de la productividad global.</explication>
+      </question>
+      <question id="20">
+        <text>EJERCICIO PRÁCTICO DEL MARTES: En la «Matriz de Impacto», ¿cómo transforma usted la tarea «Organización de reuniones»?</text>
+        <options>
+          <option>Gestión de las reservas de salas y pedido de comidas.</option>
+          <option>Alineación estratégica de los responsables de la toma de decisiones: reducción de los plazos de decisión en dos semanas en los proyectos clave.</option>
+          <option>Toma de notas y envío de las actas de las sesiones.</option>
+          <option>Moderación de los debates y comprobación de las asistencias.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La organización logística de una reunión es una tarea operativa. Su objetivo estratégico y su impacto real residen en facilitar la toma de decisiones y la alineación de las partes interesadas. -------------------------------------------------------------------------------- MIÉRCOLES: AFIANZAMIENTO, ASERTIVIDAD Y PRESENCIA EN LAS REUNIONES --------------------------------------------------------------------------------</explication>
+      </question>
+      <question id="21">
+        <text>Durante una reunión, un compañero de trabajo le interrumpe sistemáticamente. ¿Cómo reacciona?</text>
+        <options>
+          <option>Se calla inmediatamente y abandona su intervención.</option>
+          <option>Eleva el tono de voz gritando para tapar la voz de su compañero.</option>
+          <option>Vuelve a tomar la palabra con calma: Thomas, déjeme terminar mi intervención antes de reaccionar.</option>
+          <option>Abandona la sala de reuniones en señal de protesta.</option>
+        </options>
+        <bonne_reponse>2</bonne_reponse>
+        <explication>Reaccionar con calma pero con firmeza, señalando la interrupción por su nombre de pila, permite establecer límites claros y afirmar su autoridad sin dar la impresión de ser una persona impulsiva.</explication>
+      </question>
+      <question id="22">
+        <text>¿Cuál es la mejor estrategia para intervenir al inicio de una reunión estratégica?</text>
+        <options>
+          <option>Esperar al final de la sesión para expresar su opinión general.</option>
+          <option>Intervenir en los primeros 10 minutos con una pregunta o una afirmación estructurada.</option>
+          <option>Hablar solo si el presidente de la sesión le da la palabra por su nombre.</option>
+          <option>Hablar sin parar para acaparar el tiempo de intervención.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Intervenir pronto marca su presencia en el círculo de debate y establece su condición de participante activa, lo que reduce el riesgo de que su voz quede relegada posteriormente.</explication>
+      </question>
+      <question id="23">
+        <text>¿En qué consiste la técnica de la «amplificación» para contrarrestar la «bropropriation»?</text>
+        <options>
+          <option>Hablar más alto que todos los presentes en la sala.</option>
+          <option>Aliarse con una compañera para repetir y reatribuir públicamente las ideas planteadas por las mujeres.</option>
+          <option>Utilizar un micrófono o soportes visuales de gran tamaño.</option>
+          <option>Multiplicar el envío de correos electrónicos de recordatorio tras las reuniones.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La amplificación es una estrategia colectiva en la que las aliadas retoman una idea propuesta por una mujer citando su nombre (p. ej.: «Como ha señalado Sarah...»), asegurando así la autoría y la visibilidad de la intervención.</explication>
+      </question>
+      <question id="24">
+        <text>¿Cómo formular una idea estratégica para que tenga el máximo impacto en la sesión?</text>
+        <options>
+          <option>No soy una experta, pero me parece que quizá...</option>
+          <option>Mi recomendación es aplicar la opción B para garantizar nuestro margen del 15 %.</option>
+          <option>Es una idea un poco descabellada que probablemente no les vaya a gustar.</option>
+          <option>Si nadie tiene otras propuestas, quizá podríamos probar esto.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Las introducciones autocríticas («No soy experta...») minan la credibilidad incluso antes de que se escuche la idea. La afirmación directa, acompañada de argumentos financieros, se impone por sí sola.</explication>
+      </question>
+      <question id="25">
+        <text>¿Qué debe hacer si se le asigna automáticamente el papel de «secretario de la reunión» (tomador de notas)?</text>
+        <options>
+          <option>Aceptarlo sin decir nada en cada reunión para evitar el conflicto.</option>
+          <option>Proponer una rotación: Yo tomé notas la semana pasada, hoy le toca a Marc.</option>
+          <option>Negarse de forma brusca alegando que no entra dentro de sus funciones.</option>
+          <option>Tomar notas de forma ilegible para que no se lo vuelvan a pedir.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La toma de notas que no se asigna de forma equitativa es una forma de «trabajo doméstico de oficina» invisible. Proponer una rotación hace que todo el grupo se responsabilice.</explication>
+      </question>
+      <question id="26">
+        <text>¿Qué postura corporal adopta en torno a una mesa de consejo para marcar su presencia?</text>
+        <options>
+          <option>Hacerse lo más pequeña posible y cruzar los brazos debajo de la mesa.</option>
+          <option>Apoyar los antebrazos sobre la mesa, mantenerse erguida y ocupar plenamente su espacio de trabajo.</option>
+          <option>Deslumbrarse en la silla con actitud indiferente.</option>
+          <option>Mantener la cabeza gacha sobre sus notas personales.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La comunicación no verbal influye en la percepción de la autoridad. Ocupar espacio físico apoyando los brazos sobre la mesa transmite una señal clara de legitimidad y compromiso.</explication>
+      </question>
+      <question id="27">
+        <text>¿Cómo responder a un ataque personal o a una crítica fuera de lugar en una reunión?</text>
+        <options>
+          <option>Responder con un insulto equivalente.</option>
+          <option>Justificarse de forma confusa y emocional.</option>
+          <option>Centrarse inmediatamente en los hechos: Centrémonos en los datos cuantitativos del proyecto para seguir adelante.</option>
+          <option>Empezar a llorar debido al estrés.</option>
+        </options>
+        <bonne_reponse>2</bonne_reponse>
+        <explication>Remitir al interlocutor a los hechos o a las métricas neutraliza la agresividad ad hominem y sustituye el tono emocional por el rigor profesional.</explication>
+      </question>
+      <question id="28">
+        <text>¿Por qué no se recomienda comenzar las frases con «Lo siento, pero...»?</text>
+        <options>
+          <option>Porque es un error gramatical.</option>
+          <option>Porque sitúa a la interlocutora en una posición de culpa previa incluso antes de haber expuesto sus argumentos.</option>
+          <option>Porque la palabra lo siento se reserva para la vida privada.</option>
+          <option>No tiene ningún impacto en la audiencia.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La disculpa preventiva resta valor a lo que se va a decir y lleva a la audiencia a buscar el problema en lo que se va a decir, en lugar de centrarse en la propuesta.</explication>
+      </question>
+      <question id="29">
+        <text>¿Cómo debe reaccionar cuando un superior le atribuye públicamente un logro colectivo?</text>
+        <options>
+          <option>No hacer caso y atribuirse el 100 % del mérito.</option>
+          <option>Dar las gracias efusivamente y, a continuación, precisar la contribución específica de cada miembro clave.</option>
+          <option>Corregir al superior delante de todos diciendo que se ha equivocado.</option>
+          <option>Decir que usted casi no ha hecho nada y que el equipo lo ha logrado todo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Un gran líder sabe asumir la responsabilidad del éxito global al tiempo que reparte el mérito entre los equipos. Esto demuestra un alto nivel de visión estratégica y generosidad directiva.</explication>
+      </question>
+      <question id="30">
+        <text>EJERCICIO PRÁCTICO DEL MIÉRCOLES: ¿Qué frase de introducción debe preparar para la reunión?</text>
+        <options>
+          <option>Les pido disculpas de antemano por mi falta de preparación...</option>
+          <option>Basándome en los análisis de mi área, esta es la orientación estratégica que debemos validar.</option>
+          <option>Es solo mi opinión personal, hagan con ella lo que consideren oportuno.</option>
+          <option>No quiero hacerles perder el tiempo, pero...</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Una frase de anclaje eficaz se basa en la legitimidad operativa (los datos de su área) y formula una orientación clara que debe validarse. -------------------------------------------------------------------------------- JUEVES: NEGOCIACIÓN SALARIAL Y VALORACIÓN FINANCIERA --------------- -----------------------------------------------------------------</explication>
+      </question>
+      <question id="31">
+        <text>Durante su reunión para tratar el aumento salarial, su jefe menciona restricciones presupuestarias. ¿Qué le dice?</text>
+        <options>
+          <option>Ah, de acuerdo, lo entiendo; entonces lo volveremos a tratar el año que viene.</option>
+          <option>Entiendo la situación. Analicemos el valor que han generado mis proyectos y fijemos un plazo de seis meses.</option>
+          <option>Si es así, dimito de inmediato.</option>
+          <option>No es mi problema, quiero mi aumento de sueldo ahora mismo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Insistir en una negativa inmediata bloquea la negociación. Aplazar la petición a un plazo intermedio y reafirmar el valor aportado permite mantener la puerta abierta y comprometer al responsable.</explication>
+      </question>
+      <question id="32">
+        <text>¿Cuál es la regla de oro para fijar sus pretensiones salariales con motivo de un ascenso?</text>
+        <options>
+          <option>Solicitar lo que necesita para sus gastos personales.</option>
+          <option>Basarse en los estudios de mercado del sector y apuntar a la parte alta del rango para dejar margen.</option>
+          <option>Aceptar la primera propuesta económica de RR. HH. sin discutir.</option>
+          <option>Solicitar el mismo salario que su compañero con el sueldo más bajo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Una negociación profesional se basa en el valor de mercado del puesto y del perfil (puntos de referencia) y no en las necesidades personales. Apuntar a la parte alta del rango deja margen para la negociación.</explication>
+      </question>
+      <question id="33">
+        <text>Le proponen un nuevo proyecto de gran envergadura sin revalorización ni de categoría ni de salario. ¿Qué responde?</text>
+        <options>
+          <option>Muchas gracias, ¡es un honor que hayan pensado en mí!</option>
+          <option>Me alegra que confíen en mí. Definamos los objetivos asociados y las condiciones para una reevaluación dentro de seis meses.</option>
+          <option>Es trabajo gratis, lo rechazo rotundamente.</option>
+          <option>Solo lo haré si me dan un despacho más grande.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Aceptar responsabilidades adicionales sin garantizar la posibilidad de una futura revalorización económica conduce a una sobrecarga de trabajo no remunerada.</explication>
+      </question>
+      <question id="34">
+        <text>¿Cómo preparar un argumento para solicitar recursos económicos o personal adicional?</text>
+        <options>
+          <option>Haciendo hincapié en su nivel actual de cansancio y estrés.</option>
+          <option>Demostrando que esta inversión abrirá nuevas oportunidades de crecimiento rentable.</option>
+          <option>Afirmando que otros departamentos ya han conseguido nuevas contrataciones.</option>
+          <option>Amenazando con reducir la calidad del trabajo si no se le concede nada.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Los responsables de la toma de decisiones razonan en términos de retorno de la inversión (ROI). Una solicitud formulada desde la perspectiva de los beneficios estratégicos y financieros siempre tendrá más peso que una queja sobre la carga de trabajo.</explication>
+      </question>
+      <question id="35">
+        <text>¿Cuál es el impacto de la frase «Ya me daría por satisfecha si me concedieran un 5 %»?</text>
+        <options>
+          <option>Demuestra que es usted razonable y fácil de tratar.</option>
+          <option>Da pie a que su interlocutor le ofrezca el mínimo absoluto, o incluso menos.</option>
+          <option>Incita a la dirección a concederle un 10 % por simpatía.</option>
+          <option>No tiene ningún impacto en el resultado de la negociación.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Anunciar su umbral de insatisfacción o una cantidad mínima como si fuera un deseo debilita su posición inicial y sirve de punto de referencia bajo para la negociación por parte de la otra parte.</explication>
+      </question>
+      <question id="36">
+        <text>¿Cómo gestionar un silencio incómodo por parte de su jefe tras anunciar sus pretensiones económicas?</text>
+        <options>
+          <option>Rellenar el vacío reduciendo inmediatamente su petición salarial.</option>
+          <option>Mantener una mirada tranquila y segura mientras espera en silencio la respuesta de su interlocutor.</option>
+          <option>Disculparse por haber pedido una cantidad tan elevada.</option>
+          <option>Hablar del tiempo para relajar el ambiente.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El silencio es una herramienta clásica de presión psicológica en la negociación. Ceder ante la incomodidad del silencio rebajando sus pretensiones antes incluso de recibir una respuesta formal es un error estratégico.</explication>
+      </question>
+      <question id="37">
+        <text>En una negociación, ¿qué elementos del paquete retributivo global no debe pasarse por alto?</text>
+        <options>
+          <option>Únicamente el salario bruto fijo mensual.</option>
+          <option>La parte fija, la variable, las primas, el presupuesto para formación, la flexibilidad y las prestaciones en especie.</option>
+          <option>Los elogios verbales de la dirección.</option>
+          <option>Únicamente el cargo que figura en la tarjeta de visita.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Cuando el presupuesto fijo está cerrado, el valor global puede negociarse en cuanto a la parte variable, la formación, las condiciones laborales u otras prestaciones complementarias.</explication>
+      </question>
+      <question id="38">
+        <text>Su superior rechaza su ascenso diciendo: «Aún no dispone de una red de contactos interna suficiente». ¿Qué hace usted?</text>
+        <options>
+          <option>Tomarse el comentario como una derrota definitiva y rendirse.</option>
+          <option>Pedir criterios concretos: ¿Qué plan de acción para ganar influencia podemos establecer para los próximos seis meses?.</option>
+          <option>Decir que la red de contactos no sirve para nada y que solo cuenta el trabajo.</option>
+          <option>Acusar al responsable de hacer favoritismos.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Transformar una objeción imprecisa («falta de contactos») en un plan de acción cuantificable con un plazo concreto obliga al responsable a comprometerse con criterios de evaluación objetivos.</explication>
+      </question>
+      <question id="39">
+        <text>¿Cuál es la actitud correcta ante el argumento «No es el momento adecuado, dada la crisis actual»?</text>
+        <options>
+          <option>Renunciar inmediatamente a cualquier petición.</option>
+          <option>Demostrar cómo su trabajo ha permitido precisamente proteger los resultados durante la crisis.</option>
+          <option>Afirmar que la crisis no existe y que se trata de una mentira.</option>
+          <option>Exigir un aumento del doble como compensación por los perjuicios.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>En tiempos de incertidumbre económica, el valor de los empleados que protegen el margen, garantizan la fidelidad de los clientes o reducen los riesgos es aún más preciado.</explication>
+      </question>
+      <question id="40">
+        <text>EJERCICIO PRÁCTICO DEL JUEVES: Durante una simulación de negociación salarial, ¿cuál es su primera reacción?</text>
+        <options>
+          <option>Preguntar qué tiene previsto ofrecerle la empresa sin mencionar ninguna cifra.</option>
+          <option>Presentar su hoja informativa (Fact Sheet) que demuestre el valor financiero generado y fijar su cifra de referencia.</option>
+          <option>Decir que su salario es inferior al de sus compañeros.</option>
+          <option>Justificar su petición basándose en sus gastos personales derivados de préstamos.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Establecer primero el punto de referencia basándose en hechos (hoja informativa) proporciona la base de partida para toda la negociación salarial. ---------------------------------------------------------------------------- ---- VIERNES: RED ESTRATÉGICA, PATROCINIO Y CAPITAL SOCIAL --------------------------------------------------------------------------------</explication>
+      </question>
+      <question id="41">
+        <text>¿Cuál es la definición de un «patrocinador» en el ámbito empresarial en comparación con un simple «mentor»?</text>
+        <options>
+          <option>El mentor le paga los gastos de desplazamiento; el patrocinador revisa su currículum.</option>
+          <option>El mentor ofrece consejos estratégicos; el patrocinador utiliza su capital político para conseguir que le nombren.</option>
+          <option>No hay ninguna diferencia entre un mentor y un patrocinador.</option>
+          <option>El patrocinador debe ser necesariamente su superior directo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La mentoría desarrolla las competencias de forma privada; el patrocinio abre oportunidades en público. Un patrocinador es un líder que habla bien de usted a puerta cerrada, donde se toman las decisiones.</explication>
+      </question>
+      <question id="42">
+        <text>¿Cómo debe reaccionar si una red informal de responsables de la toma de decisiones («club de chicos») le parece inaccesible?</text>
+        <options>
+          <option>Intentar participar en sus actividades personales, aunque no le guste.</option>
+          <option>Identificar los nodos de influencia estratégicos y crear oportunidades de intercambio profesional sobre temas de especialización.</option>
+          <option>Criticar abiertamente a este grupo ante el conjunto de los empleados.</option>
+          <option>Permanecer aislada en su despacho a la espera de que cambien las mentalidades.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Eludir la red informal requiere crear su propia red de valor basada en la experiencia profesional, la aportación de contenido estratégico y la convergencia de intereses profesionales.</explication>
+      </question>
+      <question id="43">
+        <text>¿Cuál es la frecuencia ideal para compartir una actualización relevante con su red interna?</text>
+        <options>
+          <option>Todos los días mediante un correo electrónico detallado.</option>
+          <option>De forma selectiva, en momentos clave o a través de un resumen trimestral que aporte valor añadido.</option>
+          <option>Una vez cada cinco años, con motivo de un cambio de puesto.</option>
+          <option>Solo si la dirección se lo solicita explícitamente.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Una comunicación demasiado frecuente provoca saturación, mientras que una comunicación demasiado escasa le hace pasar desapercibido. El resumen trimestral logra el equilibrio adecuado en cuanto a visibilidad.</explication>
+      </question>
+      <question id="44">
+        <text>¿Cómo compartir un éxito personal en LinkedIn sin dar la impresión de ser una persona narcisista?</text>
+        <options>
+          <option>Soy la mejor en mi campo y, una vez más, he arrasado a la competencia.</option>
+          <option>Centrar la publicación en el aprendizaje, los retos superados y dar las gracias a los compañeros de aventura.</option>
+          <option>Publicar una foto de su nómina.</option>
+          <option>Afirmar que el éxito fue fácil y no requirió esfuerzo.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La autopromoción eficaz en las redes profesionales recurre a la pedagogía (compartir lo aprendido) y al reconocimiento colectivo para que el éxito resulte inspirador y legítimo.</explication>
+      </question>
+      <question id="45">
+        <text>¿Qué debe hacer si un compañero intenta restar importancia públicamente al impacto de su trabajo ante un directivo?</text>
+        <options>
+          <option>Insultarle para defender su honor.</option>
+          <option>Recordar con calma los hechos, con las cifras exactas de impacto validadas por la dirección.</option>
+          <option>Bajar la cabeza y asentir con la cabeza en señal de acuerdo.</option>
+          <option>Cancelar la presentación y salir de la sala.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Refutar un intento de menosprecio con cifras y hechos contrastados desarma al atacante sin entrar en un conflicto personal, preservando así su postura ejecutiva.</explication>
+      </question>
+      <question id="46">
+        <text>¿En qué consiste la estrategia del «patrocinio cruzado» entre mujeres líderes?</text>
+        <options>
+          <option>Prestarse material de oficina.</option>
+          <option>Comprometerse mutuamente a mencionar y recomendar las competencias de la otra en los círculos de decisión.</option>
+          <option>Redactar los informes de la otra en secreto.</option>
+          <option>Tomarse las vacaciones en las mismas fechas.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El patrocinio cruzado permite crear una masa crítica de influencia. Recomendar la experiencia de otra mujer refuerza la credibilidad de toda la red.</explication>
+      </question>
+      <question id="47">
+        <text>¿Cómo se debe abordar a un directivo de alto nivel para convertirlo en un posible patrocinador?</text>
+        <options>
+          <option>Enviarle un correo electrónico preguntándole: ¿Quiere ser mi patrocinador?</option>
+          <option>Pedirle su opinión sobre un proyecto estratégico concreto en el que se reconozca su experiencia.</option>
+          <option>Esperarle a la salida del aparcamiento para abordarle.</option>
+          <option>Enviarle la lista de todas sus reivindicaciones salariales.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>La relación de patrocinio no se impone. Se construye progresivamente al consultar al directivo sobre un tema profesional concreto, lo que le permite constatar el valor de sus reflexiones.</explication>
+      </question>
+      <question id="48">
+        <text>¿Cuál es el error que debe evitarse a toda costa durante las sesiones de networking internas?</text>
+        <options>
+          <option>Preparar con antelación los temas que se desean abordar.</option>
+          <option>Hablar únicamente con los compañeros cercanos de su propio equipo.</option>
+          <option>Intercambiar impresiones con personas de departamentos distintos al suyo.</option>
+          <option>Anotar los datos de contacto de las personas con las que se ha reunido para mantener el contacto.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Permanecer en su zona de confort, interactuando únicamente con su círculo más cercano, anula el interés del networking, que consiste en ampliar su visibilidad y su capital social en otros ámbitos.</explication>
+      </question>
+      <question id="49">
+        <text>¿Cómo convertir un cumplido informal recibido junto a la máquina de café en una ventaja para su carrera profesional?</text>
+        <options>
+          <option>Sonreír, dar las gracias y olvidarlo de inmediato.</option>
+          <option>Preguntarle amablemente por escrito a la persona que lo ha hecho si puede citar sus comentarios en su informe trimestral.</option>
+          <option>Repetirlo a todo el mundo de forma insistente.</option>
+          <option>Decirle a la persona que debería haberle hecho ese cumplido en una reunión oficial.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>Formalizar por escrito los comentarios positivos informales permite constituir una prueba social (Social Proof) que puede aprovecharse en las evaluaciones de rendimiento y en las negociaciones de promoción.</explication>
+      </question>
+      <question id="50">
+        <text>EJERCICIO PRÁCTICO DEL VIERNES: ¿Cuál es el primer paso para elaborar su mapa de patrocinadores?</text>
+        <options>
+          <option>Enviar un mensaje general a toda la empresa.</option>
+          <option>Hacer una lista de las tres personas de la dirección que tienen poder de decisión y conocen sus resultados.</option>
+          <option>Esperar a la próxima reorganización de la empresa.</option>
+          <option>Pedir a sus compañeros más cercanos que voten por usted.</option>
+        </options>
+        <bonne_reponse>1</bonne_reponse>
+        <explication>El mapeo comienza con la clarificación de los centros de poder. Identificar a los responsables clave de la toma de decisiones permite concentrar su energía relacional allí donde el impacto estratégico sea mayor.</explication>
+      </question>
+    </questions_choix_multiple>
+
+    <bilan>
+      <description>Balance del sábado: síntesis de la semana (ejercicios + quiz), y luego la elección entre profundizar con tu e-Coach (repetir las preguntas falladas) o ser puesta en contacto.</description>
+    </bilan>
+  </module>
+
+</modules>

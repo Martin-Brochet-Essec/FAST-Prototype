@@ -24,6 +24,7 @@
     <div class="eyebrow" data-i18n="final_eyebrow">Notre réponse</div>
 
     <div class="card" id="final-chargement">
+      <div id="final-chargement-badge" style="display:none; justify-content:center; margin:0 0 14px;"></div>
       <p style="font-size:13.5px; color:var(--text-dim); line-height:1.6; margin:0;" data-i18n="final_chargement">
         Nous préparons votre réponse à partir de l'ensemble de vos réponses...
       </p>
@@ -32,6 +33,19 @@
     <div class="card" id="final-contenu" style="display:none;">
       <h3 style="font-size:13px; color:var(--rose-deep); margin:0 0 6px;" data-i18n="final_titre">Notre conseil</h3>
       <p id="final-texte" style="font-size:14px; color:var(--text); line-height:1.7; margin:0;"></p>
+    </div>
+
+    <div class="card" id="final-pont-proactif" style="display:none; border:1px solid var(--rose-deep);">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div id="final-coach-badge"></div>
+        <div>
+          <p style="font-size:13px; font-weight:600; margin:0 0 4px;" data-i18n="final_pont_titre">Pour aller plus loin</p>
+          <p style="font-size:12.5px; color:var(--text-dim); margin:0;" data-i18n="final_pont_lead">Envie de travailler ça dans la durée ?</p>
+        </div>
+      </div>
+      <div class="steprow">
+        <button class="btn btn-ghost" id="final-pont-cta" data-i18n="final_pont_cta">Découvrir mes compétences à développer</button>
+      </div>
     </div>
 
     <div class="card" id="final-erreur" style="display:none;">
@@ -58,6 +72,21 @@ document.addEventListener('DOMContentLoaded', async function(){
   const boutonContinuer = document.getElementById('final-continuer');
 
   try{
+    // Si un coach est déjà identifié, on l'affiche en grand pendant
+    // l'attente IA.
+    if(FAST.coachDejaIdentifie()){
+      try{
+        const profils = await FAST.loadCoachProfiles();
+        const { ids } = FAST.getCoachActuel();
+        const idPrincipal = ids.find(id => profils[id]);
+        if(idPrincipal){
+          const badgeChargement = document.getElementById('final-chargement-badge');
+          badgeChargement.innerHTML = FAST.genererBadgeCoachHTML(idPrincipal, profils[idPrincipal].name, 140);
+          badgeChargement.style.display = 'flex';
+        }
+      }catch(e){ /* pas bloquant */ }
+    }
+
     // Vérifie si une synthèse finale déjà calculée correspond exactement
     // aux réponses actuelles (Q10 + Q5 + question libre + deepen) : si
     // oui, on l'affiche sans rappeler l'IA.
@@ -69,16 +98,18 @@ document.addEventListener('DOMContentLoaded', async function(){
 
     const cacheBrut = localStorage.getItem('fast_final_synthesis');
     let synthese = null;
+    const coachActuelIds = JSON.stringify(FAST.getCoachActuel().ids);
 
     if(cacheBrut){
       const cache = JSON.parse(cacheBrut);
       const memeCoach = cache.coachId === 'final_answer';
+      const memeCoachEffectif = JSON.stringify(cache.coachEffectif || []) === coachActuelIds;
       const memesReponses =
         JSON.stringify(cache.qaQ10) === JSON.stringify(qaQ10Actuelles) &&
         JSON.stringify(cache.qaQ5) === JSON.stringify(qaQ5Actuelles) &&
         JSON.stringify(cache.qaDeepen) === JSON.stringify(qaDeepenActuelles) &&
         cache.questionLibre === questionLibreActuelle;
-      if(memeCoach && memesReponses) synthese = cache;
+      if(memeCoach && memeCoachEffectif && memesReponses) synthese = cache;
     }
 
     // 'final_answer' = id du coach dans assets/prompts.xml
@@ -100,6 +131,19 @@ document.addEventListener('DOMContentLoaded', async function(){
     texte.textContent = synthese.reponseIA;
     boutonContinuer.style.display = 'inline-block';
 
+    // Badge + bloc "Pour aller plus loin" : pont vers le mode proactif
+    // (skills.html), pas de mapping compétence -> module pour l'instant.
+    try{
+      const profils = await FAST.loadCoachProfiles();
+      const { ids } = FAST.getCoachActuel();
+      const idPrincipal = ids[0];
+      const p = profils[idPrincipal];
+      if(p){
+        document.getElementById('final-coach-badge').innerHTML = FAST.genererBadgeCoachHTML(idPrincipal, p.name, 56);
+        document.getElementById('final-pont-proactif').style.display = 'block';
+      }
+    }catch(e){ /* pas bloquant si le pont échoue à s'afficher */ }
+
   }catch(erreur){
     chargement.style.display = 'none';
     erreurBloc.style.display = 'block';
@@ -108,6 +152,10 @@ document.addEventListener('DOMContentLoaded', async function(){
 
   boutonContinuer.addEventListener('click', function(){
     window.location.href = 'index.html';
+  });
+
+  document.getElementById('final-pont-cta').addEventListener('click', function(){
+    window.location.href = 'skills.html';
   });
 });
 </script>

@@ -239,6 +239,31 @@ window.FAST = (function(){
     document.body.removeChild(a);
   }
 
+  // Export dédié à la page Historique : format "Qst : / Answer :" demandé,
+  // distinct de exportTxt() (format "Q:/R:") déjà utilisée par ailleurs
+  // (engagement.html), pour ne pas modifier son comportement existant.
+  function exportHistoriqueTxt(){
+    const p = getProfile();
+    const username = (p.firstname || 'utilisatrice').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const all = JSON.parse(localStorage.getItem('fast_answers') || '[]');
+    let content = 'FAST — Historique\nUtilisatrice : ' + username + '\nGénéré le : ' + new Date().toString() + '\n\n';
+    if(all.length === 0){ content += '(aucune réponse enregistrée pour le moment)\n'; }
+    all.forEach(entry => {
+      content += '--- ' + entry.screen + ' (' + entry.ts + ') ---\n';
+      entry.qa.forEach(q => { content += 'Qst : ' + q.q + '\nAnswer : ' + (q.a || '') + '\n\n'; });
+    });
+    const now = new Date();
+    const stamp = now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '_' + pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+    const filename = 'FAST_historique_' + username + '_' + stamp + '.txt';
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a2 = document.createElement('a');
+    a2.href = URL.createObjectURL(blob);
+    a2.download = filename;
+    document.body.appendChild(a2);
+    a2.click();
+    document.body.removeChild(a2);
+  }
+
   // ---- Synthèse IA à partir des réponses d'un set de questions ----
 
   // Retrouve les réponses enregistrées pour un écran donné (le plus récent
@@ -300,12 +325,15 @@ window.FAST = (function(){
   // NB : l'historique des questions libres ("your-question") n'est PAS
   // effacé ici — il doit survivre à une remise à zéro du profil, puisqu'il
   // sert de mémoire long terme indépendante (voir getRecentQuestions).
+  // NB : le choix manuel de coach ("fast_coach_manuel") n'est PAS effacé —
+  // seule la recommandation automatique l'est, pour qu'une nouvelle soit
+  // proposée au prochain passage par Q10+Q5, sans perdre un choix explicite.
   function clearProfileData(){
     const all = JSON.parse(localStorage.getItem('fast_answers') || '[]');
     const nettoye = all.filter(e => !['q10', 'q5', 'deepen'].includes(e.screen));
     localStorage.setItem('fast_answers', JSON.stringify(nettoye));
     ['fast_last_synthesis', 'fast_profile_deepening', 'fast_deepen_questions', 'fast_final_synthesis',
-     'fast_draft_q10', 'fast_draft_q5', 'fast_draft_deepen'].forEach(k => localStorage.removeItem(k));
+     'fast_draft_q10', 'fast_draft_q5', 'fast_draft_deepen', 'fast_coach_recommande'].forEach(k => localStorage.removeItem(k));
   }
 
   // Réponses vides = section clairement signalée plutôt que silencieusement
@@ -369,6 +397,490 @@ window.FAST = (function(){
       "Réponds impérativement en " + nomLangue + ", quelle que soit la langue du texte ci-dessous.\n\n";
   }
 
+  // ---- e-Coachs spécialisés (Society / Family / Enterprise / Individual) ----
+
+  const ID_COACHS_VALIDES = ['society', 'family', 'enterprise', 'individual'];
+
+  // Charge les 4 profils de coachs spécialisés depuis <coach_profiles> dans
+  // assets/prompts.xml. Retourne un objet { id: {id, name, tagline, expertise} }.
+  // ---- Badge visuel du e-Coach ----
+  // Un badge rond par coach, à partir des 4 illustrations fournies
+  // (déjà recadrées en cercle : anneau coloré + portrait + médaillon
+  // symbole). Composant réutilisable partout où le coach "parle" :
+  // results.html, results-even-better.html, deepen-question.html,
+  // final-response.html, who-am-i.html, module.html.
+  const COACH_AVATARS = {
+    society: 'assets/img/coach-society.png',
+    family: 'assets/img/coach-family.png',
+    enterprise: 'assets/img/coach-enterprise.png',
+    individual: 'assets/img/coach-individual.png'
+  };
+
+  function echapperHtml(s){
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // genererBadgeCoachHTML(coachId, nomCoach, taille) -> chaîne HTML du badge.
+  // nomCoach : utilisé comme texte alternatif (accessibilité) et comme
+  // repli (initiale) si coachId est inconnu.
+  // taille : diamètre en pixels (défaut 72).
+  function genererBadgeCoachHTML(coachId, nomCoach, taille){
+    taille = taille || 72;
+    const src = COACH_AVATARS[coachId];
+    const alt = echapperHtml(nomCoach || '');
+    if(!src){
+      const initiale = echapperHtml((nomCoach || '?').charAt(0).toUpperCase());
+      return '<div class="fast-coach-badge" style="display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:' + taille + 'px; height:' + taille + 'px; border-radius:50%; background:#8a8a86; color:#fff; font-size:' + Math.round(taille*0.4) + 'px; font-weight:600;">' + initiale + '</div>';
+    }
+    return '<img class="fast-coach-badge" src="' + src + '" alt="' + alt + '" width="' + taille + '" height="' + taille + '" style="border-radius:50%; display:block; flex-shrink:0; object-fit:cover;">';
+  }
+
+  async function loadCoachProfiles(){
+    const res = await fetch('assets/prompts.xml');
+    if(!res.ok) throw new Error("assets/prompts.xml introuvable (HTTP " + res.status + ").");
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/xml');
+    const profils = {};
+    Array.from(doc.querySelectorAll('coach_profiles > profile')).forEach(p => {
+      const id = p.getAttribute('id');
+      const skills = Array.from(p.querySelectorAll('skills > skill')).map(s => ({
+        title: (s.querySelector('title')?.textContent || '').trim(),
+        description: (s.querySelector('description')?.textContent || '').trim()
+      }));
+      profils[id] = {
+        id: id,
+        name: (p.querySelector('name')?.textContent || '').trim(),
+        tagline: (p.querySelector('tagline')?.textContent || '').trim(),
+        expertise: (p.querySelector('expertise')?.textContent || '').trim(),
+        skills: skills
+      };
+    });
+    return profils;
+  }
+
+  // Liste des 16 compétences (4 par coach), avec celles du coach actuel
+  // (choisi manuellement ou identifié automatiquement) en premier, puis
+  // celles des 3 autres coachs à la suite (toujours utiles à proposer).
+  // Détermine un coach si aucun n'existe encore (voir assurerCoachDetermine).
+  async function getSkillsOrdonnees(){
+    await assurerCoachDetermine();
+    const profils = await loadCoachProfiles();
+    const { ids: idsPrioritaires } = getCoachActuel();
+    const idsRestants = ID_COACHS_VALIDES.filter(id => !idsPrioritaires.includes(id));
+    const ordreCoachs = idsPrioritaires.filter(id => profils[id]).concat(idsRestants);
+
+    const liste = [];
+    ordreCoachs.forEach(id => {
+      const p = profils[id];
+      if(!p) return;
+      (p.skills || []).forEach(s => {
+        liste.push({ coachId: id, coachNom: p.name, prioritaire: idsPrioritaires.includes(id), title: s.title, description: s.description });
+      });
+    });
+    return liste;
+  }
+
+  // Formate les 4 profils pour le prompt du e-Coach Générique (qui doit
+  // choisir lequel recommander).
+  function formaterDescriptionsCoachs(profils){
+    return ID_COACHS_VALIDES.map(id => {
+      const p = profils[id];
+      if(!p) return '';
+      return `- ${id} (${p.name} — ${p.tagline}) : ${p.expertise}`;
+    }).filter(Boolean).join('\n');
+  }
+
+  // Extrait la ligne finale "COACH: id" d'une réponse IA (e-Coach Générique) :
+  // renvoie { texte: synthèse nettoyée, coachId: id ou null si absent/invalide }.
+  // Extrait la ligne finale "COACH: id" d'une réponse IA (e-Coach Générique).
+  // Cherche sur la DERNIÈRE LIGNE NON VIDE plutôt que d'exiger que "id" soit
+  // le tout dernier caractère du texte — sinon un simple point final, un
+  // saut de ligne superflu, ou une majuscule ("Individual") suffit à faire
+  // échouer l'extraction silencieusement.
+  function extraireRecommandationCoach(reponseIA){
+    const lignes = reponseIA.split('\n').map(l => l.trim()).filter(Boolean);
+    const derniere = lignes[lignes.length - 1] || '';
+    const m = derniere.match(/COACH:\s*([a-zA-Z]+)/i);
+    if(!m){
+      return { texte: reponseIA.trim(), coachId: null };
+    }
+    const id = m[1].toLowerCase();
+    const texte = lignes.slice(0, -1).join('\n').trim();
+    return { texte: texte || reponseIA.trim(), coachId: ID_COACHS_VALIDES.includes(id) ? id : null };
+  }
+
+  // Choix manuel de coach(s) — persistant d'une session à l'autre. Un
+  // tableau vide signifie "pas de choix manuel, utiliser la recommandation
+  // automatique". Plusieurs ids = "mix" de coachs.
+  function getCoachManuel(){
+    try{ return JSON.parse(localStorage.getItem('fast_coach_manuel') || '[]'); }
+    catch(e){ return []; }
+  }
+  function setCoachManuel(ids){
+    localStorage.setItem('fast_coach_manuel', JSON.stringify(ids || []));
+  }
+
+  // Dernière recommandation automatique du e-Coach Générique (mise à jour à
+  // chaque nouvelle synthèse Q10+Q5, sans écraser un choix manuel existant).
+  function getCoachRecommande(){
+    return localStorage.getItem('fast_coach_recommande') || '';
+  }
+  function setCoachRecommande(id){
+    if(id) localStorage.setItem('fast_coach_recommande', id);
+  }
+
+  // Le ou les coachs effectivement utilisés : le choix manuel s'il existe,
+  // sinon la recommandation automatique (repli sur "individual" si aucune
+  // des deux n'existe encore, ex. avant tout passage par Q10/Q5).
+  function getCoachActuel(){
+    const manuel = getCoachManuel();
+    if(manuel.length > 0) return { ids: manuel, manuel: true };
+    const auto = getCoachRecommande();
+    return { ids: [auto || 'individual'], manuel: false };
+  }
+
+  // Vrai seulement si un coach a réellement été identifié (choix manuel ou
+  // recommandation IA déjà calculée) — par opposition au simple repli
+  // "individual" par défaut de getCoachActuel(). Sert à savoir si on peut
+  // afficher le badge du coach pendant un écran de chargement, avant même
+  // d'avoir appelé l'IA.
+  function coachDejaIdentifie(){
+    return getCoachManuel().length > 0 || !!getCoachRecommande();
+  }
+
+  // S'assure qu'une vraie recommandation (basée sur les réponses) existe
+  // avant de répondre à une question, plutôt que de silencieusement
+  // retomber sur "individual" par défaut. Utile quand l'utilisatrice
+  // atteint your-question.html sans être passée par results-even-better.html
+  // (ex: parcours new-question.html pour une utilisatrice déjà connue).
+  // Ne fait rien si un choix manuel existe déjà, ou si une recommandation
+  // automatique a déjà été calculée, ou si Q10/Q5 ne sont pas disponibles
+  // (dans ce dernier cas, le repli "individual" reste le seul recours).
+  async function assurerCoachDetermine(){
+    if(getCoachManuel().length > 0) return;
+    if(getCoachRecommande()) return;
+    const qaQ10 = getAnswersFor('q10');
+    const qaQ5 = getAnswersFor('q5');
+    if(qaQ10.length > 0 && qaQ5.length > 0){
+      try{ await runProfileDeepening('profile_deepening'); }
+      catch(e){ /* échec silencieux : le repli "individual" prendra le relais */ }
+    }
+  }
+
+  // Construit {COACH_NOM}/{COACH_EXPERTISE} pour un ou plusieurs coachs
+  // (mix) : noms joints par " + ", expertises concaténées avec leur nom en
+  // préfixe pour rester lisible par l'IA en cas de mix.
+  async function construireContexteCoach(){
+    await assurerCoachDetermine();
+    const profils = await loadCoachProfiles();
+    const { ids } = getCoachActuel();
+    const valides = ids.filter(id => profils[id]);
+    if(valides.length === 0){
+      return { nom: 'Coach de carrière généraliste', expertise: 'Accompagnement de carrière généraliste, tous domaines.' };
+    }
+    const nom = valides.map(id => profils[id].name).join(' + ');
+    const expertise = valides.map(id => `[${profils[id].name}] ${profils[id].expertise}`).join('\n');
+    return { nom: nom, expertise: expertise };
+  }
+
+  // ---- Modules d'accompagnement quotidien ----
+  // Schéma : un module = 5 exercices (Lun-Ven) + une banque de questions à
+  // choix multiple + un bilan du samedi.
+  //
+  // Déroulé d'une journée :
+  //  - Lundi (jour 1) : quiz -> proposition d'exercice du jour
+  //  - Mardi à Vendredi (jour 2-5) : retour sur l'exercice de la veille ->
+  //    analyse IA -> quiz -> proposition d'exercice du jour
+  //  - Après le jour 5 : bilan de la semaine (synthèse + choix)
+  //
+  // Le quiz : question tirée de la banque (sans répéter une question déjà
+  // vue cette semaine), réponse immédiatement corrigée (vert/rouge), un
+  // objectif indicatif de 10 questions/jour, arrêtable à tout moment via
+  // "J'en ferai plus demain".
+
+  // Charge un module depuis le fichier de la langue actuelle
+  // (assets/modules-<lang>.xml). Si les questions du quiz n'y sont pas
+  // encore traduites (balise absente), on les récupère depuis
+  // assets/modules-fr.xml — les exercices restent dans la langue actuelle.
+  async function chargerModuleDepuisFichier(moduleId, lang){
+    const res = await fetch(`assets/modules-${lang}.xml`);
+    if(!res.ok) return null;
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/xml');
+    const noeud = Array.from(doc.querySelectorAll('module')).find(m => m.getAttribute('id') === moduleId);
+    if(!noeud) return null;
+
+    const exercices = Array.from(noeud.querySelectorAll('exercices > exercice')).map(e => ({
+      numero: parseInt(e.getAttribute('numero'), 10),
+      jour: e.getAttribute('jour') || '',
+      objectif: (e.querySelector('objectif')?.textContent || '').trim()
+    }));
+
+    const questions = Array.from(noeud.querySelectorAll('questions_choix_multiple > question')).map(q => ({
+      id: q.getAttribute('id'),
+      text: (q.querySelector('text')?.textContent || '').trim(),
+      options: Array.from(q.querySelectorAll('options > option')).map(o => o.textContent.trim()),
+      bonneReponse: parseInt(q.querySelector('bonne_reponse')?.textContent || '0', 10),
+      explication: (q.querySelector('explication')?.textContent || '').trim()
+    }));
+
+    return {
+      id: moduleId,
+      name: (noeud.querySelector('name')?.textContent || '').trim(),
+      description: (noeud.querySelector('description')?.textContent || '').trim(),
+      exercices: exercices,
+      questions: questions,
+      bilanDescription: (noeud.querySelector('bilan > description')?.textContent || '').trim()
+    };
+  }
+
+  async function loadModule(moduleId){
+    const lang = getLang();
+    let moduleDef = await chargerModuleDepuisFichier(moduleId, lang);
+
+    if(!moduleDef){
+      // Langue actuelle sans ce module du tout : repli intégral sur le français.
+      moduleDef = await chargerModuleDepuisFichier(moduleId, 'fr');
+      if(!moduleDef) throw new Error(`Module "${moduleId}" introuvable (même en français).`);
+      return moduleDef;
+    }
+
+    if(moduleDef.questions.length === 0 && lang !== 'fr'){
+      // Exercices traduits, mais questions du quiz pas encore disponibles
+      // dans cette langue : on les récupère en français uniquement.
+      const moduleFr = await chargerModuleDepuisFichier(moduleId, 'fr');
+      if(moduleFr) moduleDef.questions = moduleFr.questions;
+    }
+
+    return moduleDef;
+  }
+
+  function getEtatModule(moduleId){
+    try{ return JSON.parse(localStorage.getItem('fast_module_' + moduleId) || 'null'); }
+    catch(e){ return null; }
+  }
+  function sauverEtatModule(moduleId, etat){
+    localStorage.setItem('fast_module_' + moduleId, JSON.stringify(etat));
+  }
+
+  // Démarre (ou reprend) un module : renvoie l'état courant.
+  // phase : 'quiz' | 'retour_veille' | 'analyse_veille' | 'exercice_propose' | 'bilan'
+  function demarrerOuReprendreModule(moduleId){
+    let etat = getEtatModule(moduleId);
+    if(!etat){
+      etat = {
+        jour: 1,
+        phase: 'quiz',
+        historiqueExercices: [], // {jour, objectifSuggere, retour, analyse}
+        questionsVuesSemaine: [], // ids
+        reponsesQuizSemaine: {},  // { id: true/false (correcte) }
+        quizAujourdhui: { correctes: 0, incorrectes: 0, repondues: 0 }
+      };
+      sauverEtatModule(moduleId, etat);
+    }
+    return etat;
+  }
+
+  // ---- Quiz ----
+
+  // Ordre linéaire, pas de tirage aléatoire : on prend toujours la
+  // prochaine question non répondue cette semaine, dans l'ordre du
+  // fichier (donc par jour, puisque les questions y sont groupées par 10).
+  function tirerQuestionQuiz(moduleDef, moduleId){
+    const etat = getEtatModule(moduleId);
+    const dispo = moduleDef.questions.filter(q => !etat.questionsVuesSemaine.includes(q.id));
+    if(dispo.length === 0) return null; // banque de la semaine épuisée
+    return dispo[0];
+  }
+
+  // Enregistre la réponse à une question de quiz (avec l'index choisi, pour
+  // permettre une relecture ultérieure). Renvoie si elle était correcte,
+  // pour l'affichage immédiat (bloc vert/rouge).
+  function soumettreReponseQuiz(moduleId, question, indexChoisi){
+    const etat = getEtatModule(moduleId);
+    const correcte = indexChoisi === question.bonneReponse;
+    etat.questionsVuesSemaine.push(question.id);
+    etat.reponsesQuizSemaine[question.id] = { correcte: correcte, indexChoisi: indexChoisi };
+    etat.quizAujourdhui.repondues += 1;
+    if(correcte) etat.quizAujourdhui.correctes += 1; else etat.quizAujourdhui.incorrectes += 1;
+    sauverEtatModule(moduleId, etat);
+    return correcte;
+  }
+
+  // "J'en ferai plus demain" : passe normalement à la proposition
+  // d'exercice du jour — SAUF en mode rattrapage (questions ratées reprises
+  // depuis le bilan du samedi), où l'on retourne directement au bilan avec
+  // une nouvelle analyse, sans repasser par l'exercice du vendredi.
+  function arreterQuizPourAujourdhui(moduleId){
+    const etat = getEtatModule(moduleId);
+    if(etat.modeRattrapage){
+      etat.modeRattrapage = false;
+      etat.phase = 'bilan';
+      delete etat.bilan; // force une nouvelle synthèse IA
+    } else {
+      etat.phase = 'exercice_propose';
+    }
+    sauverEtatModule(moduleId, etat);
+    return etat;
+  }
+
+  function formaterStatsQuiz(etat){
+    const total = Object.keys(etat.reponsesQuizSemaine).length;
+    if(total === 0) return "(aucune question de quiz répondue pour l'instant)";
+    const correctes = Object.values(etat.reponsesQuizSemaine).filter(r => r.correcte).length;
+    return `${correctes} bonnes réponses sur ${total} questions répondues cette semaine.`;
+  }
+
+  // ---- Exercice du jour ----
+
+  // Valide la proposition d'exercice du jour et avance. Plus de champ
+  // libre : l'exercice suggéré (pré-écrit dans le module) est utilisé tel
+  // quel, l'utilisatrice n'a pas à reformuler ce qu'elle va faire.
+  // Conserve aussi le nombre de questions de quiz répondues ce jour-là,
+  // pour que l'IA puisse commenter l'atteinte (ou non) de l'objectif
+  // quotidien de 10 questions.
+  function validerExerciceDuJour(moduleId, moduleDef){
+    const etat = getEtatModule(moduleId);
+    const exerciceDuJour = moduleDef.exercices[etat.jour - 1];
+
+    etat.historiqueExercices.push({
+      jour: etat.jour,
+      objectifSuggere: exerciceDuJour ? exerciceDuJour.objectif : '',
+      retour: null,
+      analyse: null,
+      quizRepondues: etat.quizAujourdhui.repondues
+    });
+
+    if(etat.jour >= moduleDef.exercices.length){
+      etat.phase = 'retour_samedi';
+    } else {
+      etat.jour += 1;
+      etat.phase = 'retour_veille';
+      etat.quizAujourdhui = { correctes: 0, incorrectes: 0, repondues: 0 };
+    }
+    sauverEtatModule(moduleId, etat);
+    return etat;
+  }
+
+  // Réinitialise complètement un module : l'utilisatrice repart de zéro,
+  // toutes les réponses (exercices + quiz) sont oubliées.
+  function reinitialiserModule(moduleId){
+    localStorage.removeItem('fast_module_' + moduleId);
+  }
+
+  // Réinitialise uniquement les questions du quiz (toutes les questions
+  // redeviennent disponibles, les bonnes/mauvaises réponses sont oubliées),
+  // sans toucher au jour en cours ni aux exercices déjà validés. Accessible
+  // depuis l'écran de quiz de n'importe quel jour.
+  function reinitialiserQuestionsQuiz(moduleId){
+    const etat = getEtatModule(moduleId);
+    if(!etat) return;
+    etat.questionsVuesSemaine = [];
+    etat.reponsesQuizSemaine = {};
+    etat.quizAujourdhui = { correctes: 0, incorrectes: 0, repondues: 0 };
+    sauverEtatModule(moduleId, etat);
+  }
+
+  // Formate une entrée d'historique en indiquant si l'objectif quotidien de
+  // quiz (10 questions) a été atteint ce jour-là — pour que l'IA félicite
+  // ou responsabilise en conséquence (voir consigne dans prompts.xml).
+  function formaterEntreeHistorique(h, idx){
+    const q = (h.quizRepondues !== undefined) ? h.quizRepondues : null;
+    let statutQuiz = '';
+    if(q !== null){
+      statutQuiz = q >= 10
+        ? ` (objectif quotidien de 10 questions dépassé : ${q} répondues)`
+        : ` (objectif quotidien de 10 questions NON atteint : seulement ${q} répondues)`;
+    }
+    return `${idx + 1}. Objectif : ${h.objectifSuggere}${statutQuiz}\nRetour : ${h.retour || '(pas encore)'}\nAnalyse : ${h.analyse || '(pas encore)'}`;
+  }
+
+  // Retour sur le dernier exercice de la semaine (celui du vendredi),
+  // documenté le samedi juste avant le bilan. Pas d'analyse IA séparée
+  // ici : ce retour est directement intégré au rapport du samedi.
+  function soumettreRetourSamedi(moduleId, retourTexte){
+    const etat = getEtatModule(moduleId);
+    const derniereEntree = etat.historiqueExercices[etat.historiqueExercices.length - 1];
+    derniereEntree.retour = retourTexte;
+    etat.phase = 'bilan';
+    sauverEtatModule(moduleId, etat);
+    return etat;
+  }
+
+  // Retour sur l'exercice de la veille (jour 2 à 5) : appelle l'IA pour
+  // produire une analyse, basée sur le profil + l'historique du module +
+  // les résultats du quiz.
+  async function soumettreRetourVeille(moduleId, retourTexte){
+    const qaQ10 = getAnswersFor('q10');
+    const qaQ5 = getAnswersFor('q5');
+    const etat = getEtatModule(moduleId);
+    const derniereEntree = etat.historiqueExercices[etat.historiqueExercices.length - 1];
+    derniereEntree.retour = retourTexte;
+
+    const historiqueTexte = etat.historiqueExercices.slice(0, -1).map(formaterEntreeHistorique).join('\n\n') || '(aucun exercice précédent)';
+
+    const contexteCoach = await construireContexteCoach();
+    const prompt = await loadCoachPrompt('module_analyse');
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
+      prompt.userPromptTemplate
+        .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
+        .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
+        .replace('{HISTORIQUE_MODULE}', historiqueTexte)
+        .replace('{STATS_QUIZ}', formaterStatsQuiz(etat))
+        .replace('{EXERCICE_COURANT}', derniereEntree.objectifSuggere)
+        .replace('{RETOUR_UTILISATRICE}', retourTexte)
+        .replace(/{COACH_NOM}/g, contexteCoach.nom)
+        .replace(/{COACH_EXPERTISE}/g, contexteCoach.expertise);
+
+    const analyse = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    derniereEntree.analyse = analyse;
+    etat.phase = 'analyse_veille';
+    sauverEtatModule(moduleId, etat);
+    return analyse;
+  }
+
+  // Après avoir vu l'analyse de la veille, on enchaîne directement sur le
+  // quiz du jour (pas de confirmation oui/non dans cette version).
+  function passerAuQuizDuJour(moduleId){
+    const etat = getEtatModule(moduleId);
+    etat.phase = 'quiz';
+    sauverEtatModule(moduleId, etat);
+    return etat;
+  }
+
+  // ---- Bilan du samedi ----
+
+  function getQuestionsRateesSemaine(moduleDef, moduleId){
+    const etat = getEtatModule(moduleId);
+    const idsRatees = Object.keys(etat.reponsesQuizSemaine).filter(id => !etat.reponsesQuizSemaine[id].correcte);
+    return moduleDef.questions.filter(q => idsRatees.includes(q.id));
+  }
+
+  async function produireBilanModule(moduleId){
+    const qaQ10 = getAnswersFor('q10');
+    const qaQ5 = getAnswersFor('q5');
+    const etat = getEtatModule(moduleId);
+    if(!etat) throw new Error("État du module introuvable.");
+    if(etat.bilan) return etat.bilan; // déjà calculé, pas de rappel IA
+
+    const historiqueTexte = etat.historiqueExercices.map(formaterEntreeHistorique).join('\n\n');
+
+    const contexteCoach = await construireContexteCoach();
+    const prompt = await loadCoachPrompt('module_bilan');
+    const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
+      prompt.userPromptTemplate
+        .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
+        .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
+        .replace('{HISTORIQUE_MODULE}', historiqueTexte)
+        .replace('{STATS_QUIZ}', formaterStatsQuiz(etat))
+        .replace(/{COACH_NOM}/g, contexteCoach.nom)
+        .replace(/{COACH_EXPERTISE}/g, contexteCoach.expertise);
+
+    const bilan = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    etat.bilan = bilan;
+    etat.termine = true;
+    sauverEtatModule(moduleId, etat);
+    return bilan;
+  }
+
 
   // Point d'entrée utilisé par results.html : rassemble les réponses du set
   // `sourceScreenId` (typiquement 'q10'), assemble le prompt du coach
@@ -377,18 +889,24 @@ window.FAST = (function(){
   async function runCoachSynthesis(coachId, sourceScreenId){
     const qa = getAnswersFor(sourceScreenId);
     const answersBlock = formatAnswersBlock(qa);
+    const profils = await loadCoachProfiles();
     const prompt = await loadCoachPrompt(coachId);
 
     const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
-      prompt.userPromptTemplate.replace('{ANSWERS}', answersBlock);
+      prompt.userPromptTemplate
+        .replace('{ANSWERS}', answersBlock)
+        .replace('{DESCRIPTIONS_COACHS}', formaterDescriptionsCoachs(profils));
 
-    const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    const reponseBrute = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    const { texte, coachId: coachRecommandeId } = extraireRecommandationCoach(reponseBrute);
+    if(coachRecommandeId) setCoachRecommande(coachRecommandeId);
 
     const synthese = {
       coachId: coachId,
       source: sourceScreenId,
       ts: new Date().toISOString(),
-      reponseIA: reponseIA,
+      reponseIA: texte,
+      coachRecommande: coachRecommandeId,
       qa: qa
     };
     localStorage.setItem('fast_last_synthesis', JSON.stringify(synthese));
@@ -409,6 +927,7 @@ window.FAST = (function(){
     const questionLibre = (qaYourQuestion[0] && qaYourQuestion[0].a) || '';
     const historique = getRecentQuestions(5);
     const historiqueDeepen = getRecentDeepenHistory(5, true);
+    const contexteCoach = await construireContexteCoach();
 
     const prompt = await loadCoachPrompt(coachId);
 
@@ -419,7 +938,9 @@ window.FAST = (function(){
         .replace('{ANSWERS_DEEPEN}', formatAnswersBlock(qaDeepen))
         .replace('{QUESTION_LIBRE}', questionLibre)
         .replace('{HISTORIQUE_QUESTIONS}', formatQuestionsBlock(historique))
-        .replace('{HISTORIQUE_DEEPEN}', formatAnswersBlock(historiqueDeepen));
+        .replace('{HISTORIQUE_DEEPEN}', formatAnswersBlock(historiqueDeepen))
+        .replace(/{COACH_NOM}/g, contexteCoach.nom)
+        .replace(/{COACH_EXPERTISE}/g, contexteCoach.expertise);
 
     const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
 
@@ -427,6 +948,7 @@ window.FAST = (function(){
       coachId: coachId,
       ts: new Date().toISOString(),
       reponseIA: reponseIA,
+      coachEffectif: getCoachActuel().ids,
       qaQ10: qaQ10, qaQ5: qaQ5, qaDeepen: qaDeepen, questionLibre: questionLibre
     };
     localStorage.setItem('fast_final_synthesis', JSON.stringify(synthese));
@@ -434,23 +956,31 @@ window.FAST = (function(){
   }
 
   // Approfondissement du profil (Q10 + Q5) : utilisé par
-  // results-even-better.html, coach "profile_deepening".
+  // results-even-better.html, coach "profile_deepening". En plus de la
+  // synthèse, ce coach recommande un e-Coach spécialisé (society/family/
+  // enterprise/individual), extrait de la réponse et mémorisé comme
+  // recommandation automatique (sans écraser un choix manuel existant).
   async function runProfileDeepening(coachId){
     const qaQ10 = getAnswersFor('q10');
     const qaQ5 = getAnswersFor('q5');
 
+    const profils = await loadCoachProfiles();
     const prompt = await loadCoachPrompt(coachId);
     const promptFinal = construireConsigneIA() + prompt.systemPrompt + "\n\n" +
       prompt.userPromptTemplate
         .replace('{ANSWERS_Q10}', formatAnswersBlock(qaQ10))
-        .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5));
+        .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
+        .replace('{DESCRIPTIONS_COACHS}', formaterDescriptionsCoachs(profils));
 
-    const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    const reponseBrute = await window.FAST_AI.interrogerAgentIA(promptFinal);
+    const { texte, coachId: coachRecommandeId } = extraireRecommandationCoach(reponseBrute);
+    if(coachRecommandeId) setCoachRecommande(coachRecommandeId);
 
     const synthese = {
       coachId: coachId,
       ts: new Date().toISOString(),
-      reponseIA: reponseIA,
+      reponseIA: texte,
+      coachRecommande: coachRecommandeId,
       qaQ10: qaQ10, qaQ5: qaQ5
     };
     localStorage.setItem('fast_profile_deepening', JSON.stringify(synthese));
@@ -483,7 +1013,13 @@ window.FAST = (function(){
     const qaYourQuestion = getAnswersFor('your-question');
     const questionLibre = (qaYourQuestion[0] && qaYourQuestion[0].a) || '';
 
-    const signatureActuelle = JSON.stringify({ qaQ10: qaQ10, qaQ5: qaQ5, questionLibre: questionLibre });
+    // Déterminé AVANT la signature de cache : sinon un coach "individual"
+    // provisoire pourrait s'y retrouver figé avant d'être remplacé par la
+    // vraie recommandation calculée à partir des réponses.
+    await assurerCoachDetermine();
+    const coachActuel = getCoachActuel();
+
+    const signatureActuelle = JSON.stringify({ qaQ10: qaQ10, qaQ5: qaQ5, questionLibre: questionLibre, coach: coachActuel.ids });
     const cacheBrut = localStorage.getItem('fast_deepen_questions');
     if(cacheBrut){
       const cache = JSON.parse(cacheBrut);
@@ -492,6 +1028,7 @@ window.FAST = (function(){
       }
     }
 
+    const contexteCoach = await construireContexteCoach();
     const prompt = await loadCoachPrompt(coachId);
     const historique = getRecentQuestions(5);
     const historiqueDeepen = getRecentDeepenHistory(5, false);
@@ -501,7 +1038,9 @@ window.FAST = (function(){
         .replace('{ANSWERS_Q5}', formatAnswersBlock(qaQ5))
         .replace('{QUESTION_LIBRE}', questionLibre)
         .replace('{HISTORIQUE_QUESTIONS}', formatQuestionsBlock(historique))
-        .replace('{HISTORIQUE_DEEPEN}', formatAnswersBlock(historiqueDeepen));
+        .replace('{HISTORIQUE_DEEPEN}', formatAnswersBlock(historiqueDeepen))
+        .replace(/{COACH_NOM}/g, contexteCoach.nom)
+        .replace(/{COACH_EXPERTISE}/g, contexteCoach.expertise);
 
     const reponseIA = await window.FAST_AI.interrogerAgentIA(promptFinal);
     const questions = parseTroisQuestions(reponseIA);
@@ -902,10 +1441,22 @@ window.FAST = (function(){
     loadQuestions: loadQuestions, runStepper: runStepper,
     getProfile: getProfile, saveProfile: saveProfile,
     getConfig: getConfig, saveConfig: saveConfig,
-    logAnswers: logAnswers, exportTxt: exportTxt,
+    logAnswers: logAnswers, exportTxt: exportTxt, exportHistoriqueTxt: exportHistoriqueTxt,
     getAnswersFor: getAnswersFor, runCoachSynthesis: runCoachSynthesis,
     hasCompletedProfile: hasCompletedProfile, clearProfileData: clearProfileData,
     getRecentQuestions: getRecentQuestions, getRecentDeepenHistory: getRecentDeepenHistory,
+    loadCoachProfiles: loadCoachProfiles, getCoachManuel: getCoachManuel, setCoachManuel: setCoachManuel,
+    getCoachRecommande: getCoachRecommande, getCoachActuel: getCoachActuel, idsCoachsValides: ID_COACHS_VALIDES,
+    coachDejaIdentifie: coachDejaIdentifie,
+    genererBadgeCoachHTML: genererBadgeCoachHTML,
+    getSkillsOrdonnees: getSkillsOrdonnees,
+    loadModule: loadModule, demarrerOuReprendreModule: demarrerOuReprendreModule, getEtatModule: getEtatModule,
+    tirerQuestionQuiz: tirerQuestionQuiz, soumettreReponseQuiz: soumettreReponseQuiz,
+    arreterQuizPourAujourdhui: arreterQuizPourAujourdhui, validerExerciceDuJour: validerExerciceDuJour,
+    soumettreRetourVeille: soumettreRetourVeille, passerAuQuizDuJour: passerAuQuizDuJour,
+    soumettreRetourSamedi: soumettreRetourSamedi,
+    getQuestionsRateesSemaine: getQuestionsRateesSemaine, produireBilanModule: produireBilanModule,
+    reinitialiserModule: reinitialiserModule, reinitialiserQuestionsQuiz: reinitialiserQuestionsQuiz,
     runFinalSynthesis: runFinalSynthesis,
     runProfileDeepening: runProfileDeepening,
     generateDeepenQuestions: generateDeepenQuestions,
@@ -931,6 +1482,8 @@ class FastHeader extends HTMLElement {
           <a class="menu-item" href="index.html" data-i18n="menu_accueil">Accueil</a>
           <a class="menu-item" href="profile.html" data-i18n="menu_profil">Profil</a>
           <a class="menu-item" href="who-am-i.html" data-i18n="menu_whoami">Qui suis-je</a>
+          <a class="menu-item" href="history.html" data-i18n="menu_historique">Historique</a>
+          <a class="menu-item" href="skills.html" data-i18n="menu_skills">Améliorer mes compétences</a>
           <a class="menu-item" href="config.html" data-i18n="menu_config">Configuration</a>
           <a class="menu-item" href="subscription.html" data-i18n="menu_subscription">Abonnement</a>
           <a class="menu-item" href="index.html" data-i18n="menu_deconnexion">Se déconnecter</a>
